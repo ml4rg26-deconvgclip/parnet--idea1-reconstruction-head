@@ -26,6 +26,7 @@ Quick start::
 from .bed_utils import GenomicInterval, parse_tile_name
 from .datasets import FilteredMultiTaskDataset, center_crop_item
 from .filters import FilterFunction, filter_min_read_count, filter_minimum_length
+from .globalclip_reconstruction import GlobalCLIPReconstructionHead
 from .hfds_utils import convert_hfds_sample, hfds_sample_passes_filter
 from .training_utils import MetricHistory
 from .sparse_utils import (
@@ -63,6 +64,8 @@ __all__ = [
     "FilterFunction",
     "filter_minimum_length",
     "filter_min_read_count",
+    # globalclip_reconstruction
+    "GlobalCLIPReconstructionHead",
     # datasets
     "FilteredMultiTaskDataset",
     "center_crop_item",
