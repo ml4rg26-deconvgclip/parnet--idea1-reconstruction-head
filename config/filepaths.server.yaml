@@ -1,0 +1,32 @@
+# ── Pretrained PARNET backbone ────────────────────────────────────────────────
+models:
+  parnet.7m-0.0: "/mnt/storage1/ml4rg26-shared/parnet-eclip/models-full-rbp-set/parnet.7m-0.0.pt"
+
+# ── GlobalCLIP datasets (pt.gz) ───────────────────────────────────────────────
+data:
+  eclip:
+    pt:      "/mnt/storage1/ml4rg26-deconvgclip/provided_data/600nt_globalCLIP_synchronized_datasets/eCLIP_600bp_signalfiltered.pt.gz"
+    meta:    "/mnt/storage1/ml4rg26-deconvgclip/provided_data/600nt_globalCLIP_synchronized_datasets/eCLIP_600bp_signalfiltered.metadata.yaml"
+    rbp_tsv: "/mnt/storage1/ml4rg26-deconvgclip/provided_data/600nt_globalCLIP_synchronized_datasets/eCLIP_600bp_signalfiltered.rbp_cts.tsv"
+
+  globalclip_lysate_noNHS:
+    pt:   "/mnt/storage1/ml4rg26-deconvgclip/provided_data/600nt_globalCLIP_synchronized_datasets/globalclip_lysate_noNHS_600bp_signalfiltered.pt.gz"
+    meta: "/mnt/storage1/ml4rg26-deconvgclip/provided_data/600nt_globalCLIP_synchronized_datasets/globalclip_lysate_noNHS_600bp_signalfiltered.metadata.yaml"
+
+  globalclip_interphase:
+    pt:   "/mnt/storage1/ml4rg26-deconvgclip/provided_data/600nt_globalCLIP_synchronized_datasets/globalclip_interphase_600bp_signalfiltered.pt.gz"
+    meta: "/mnt/storage1/ml4rg26-deconvgclip/provided_data/600nt_globalCLIP_synchronized_datasets/globalclip_interphase_600bp_signalfiltered.metadata.yaml"
+
+  globalclip_lysate:
+    pt:   "/mnt/storage1/ml4rg26-deconvgclip/provided_data/600nt_globalCLIP_synchronized_datasets/globalclip_lysate_600bp_signalfiltered.pt.gz"
+    meta: "/mnt/storage1/ml4rg26-deconvgclip/provided_data/600nt_globalCLIP_synchronized_datasets/globalclip_lysate_600bp_signalfiltered.metadata.yaml"
+
+# ── Output directories ────────────────────────────────────────────────────────
+results:
+  standard_model: "results/globalclip/standard"
+  qlayer_model:   "results/globalclip/qlayer"
+  analysis:       "results/globalclip/analysis"
+
+# ── Metadata ──────────────────────────────────────────────────────────────────
+metadata:
+  full_rbp_set: "/mnt/storage1/ml4rg26-deconvgclip/provided_data/600nt_globalCLIP_synchronized_datasets/eCLIP_600bp_signalfiltered.rbp_cts.tsv"
