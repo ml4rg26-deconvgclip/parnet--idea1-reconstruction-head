@@ -9,6 +9,17 @@ develop/
 # Don't add logs, i.e. model outputs for test runs etc.
 **/logs/
 
+# Large local datasets and checkpoints
+*.pyc
+__pycache__/
+.DS_Store
+*.hfds
+resources/
+data/
+provided_data/
+*.pt
+*.pt.gz
+
 # Byte-compiled / optimized / DLL files
 **/__pycache__/
 *.py[cod]

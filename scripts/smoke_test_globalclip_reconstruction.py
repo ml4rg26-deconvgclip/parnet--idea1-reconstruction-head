@@ -10,6 +10,7 @@ can still run.
 from __future__ import annotations
 
 import argparse
+import gzip
 import sys
 from pathlib import Path
 from typing import Any
@@ -31,6 +32,14 @@ if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 from parnet_demo_utils import GlobalCLIPReconstructionHead  # noqa: E402
+
+
+_BASE_TO_CHANNEL = {
+    "A": 0,
+    "C": 1,
+    "G": 2,
+    "T": 3,
+}
 
 
 def _default_config_path() -> Path:
@@ -81,6 +90,187 @@ def _synthetic_batch(batch_size: int, seq_len: int) -> dict[str, dict[str, torch
     }
 
 
+def _load_pt_or_ptgz(path: Path) -> dict[str, Any]:
+    """Load a torch dataset file without parnet_additional_utils dataset classes."""
+    if path.name.endswith(".pt.gz"):
+        companion_pt = Path(str(path)[:-3])
+        if companion_pt.exists():
+            print(f"Loading companion .pt with mmap=True: {companion_pt}")
+            return torch.load(companion_pt, mmap=True, weights_only=False)
+        print(f"Loading gzip torch file: {path}")
+        with gzip.open(path, "rb") as handle:
+            return torch.load(handle, weights_only=False)
+
+    print(f"Loading torch file with mmap=True: {path}")
+    return torch.load(path, mmap=True, weights_only=False)
+
+
+def _fit_length_1d(values: torch.Tensor, seq_len: int) -> torch.Tensor:
+    """Pad or center-crop a 1D tensor to ``seq_len``."""
+    if values.shape[0] == seq_len:
+        return values
+    if values.shape[0] > seq_len:
+        start = (values.shape[0] - seq_len) // 2
+        return values[start : start + seq_len]
+
+    out = torch.zeros(seq_len, dtype=values.dtype)
+    offset = (seq_len - values.shape[0]) // 2
+    out[offset : offset + values.shape[0]] = values
+    return out
+
+
+def _pad_or_crop_sequence(seq: str, seq_len: int, meta: dict[str, Any] | None) -> str:
+    """Return a DNA string of exactly ``seq_len`` using N-padding if needed."""
+    if len(seq) == seq_len:
+        return seq
+    if len(seq) > seq_len:
+        start = (len(seq) - seq_len) // 2
+        return seq[start : start + seq_len]
+
+    pad = seq_len - len(seq)
+    pad_side = (meta or {}).get("pad_side")
+    if pad_side == 1:
+        return ("N" * pad) + seq
+    if pad_side == 2:
+        return seq + ("N" * pad)
+
+    left = pad // 2
+    right = pad - left
+    return ("N" * left) + seq + ("N" * right)
+
+
+def _sequence_to_onehot(
+    sequence: str | bytes | torch.Tensor,
+    seq_len: int,
+    meta: dict[str, Any] | None,
+) -> torch.Tensor:
+    """Convert a sample sequence to channels-first one-hot shape ``(4, seq_len)``."""
+    if torch.is_tensor(sequence):
+        tensor = sequence.float()
+        if tensor.ndim != 2:
+            raise ValueError(f"Expected 2D one-hot sequence, got {tuple(tensor.shape)}")
+        if tensor.shape == (seq_len, 4):
+            return tensor.T.contiguous()
+        if tensor.shape == (4, seq_len):
+            return tensor.contiguous()
+        if tensor.shape[-1] == 4:
+            channels_first = tensor.T.contiguous()
+        elif tensor.shape[0] == 4:
+            channels_first = tensor.contiguous()
+        else:
+            raise ValueError(f"Cannot infer one-hot sequence layout: {tuple(tensor.shape)}")
+
+        if channels_first.shape[1] == seq_len:
+            return channels_first
+        fitted = [
+            _fit_length_1d(channels_first[channel], seq_len)
+            for channel in range(channels_first.shape[0])
+        ]
+        return torch.stack(fitted, dim=0)
+
+    if isinstance(sequence, bytes):
+        sequence = sequence.decode("utf-8")
+    if not isinstance(sequence, str):
+        raise TypeError(f"Unsupported sequence type: {type(sequence).__name__}")
+
+    sequence = _pad_or_crop_sequence(sequence.upper(), seq_len, meta)
+    onehot = torch.zeros(4, seq_len, dtype=torch.float32)
+    for position, base in enumerate(sequence):
+        channel = _BASE_TO_CHANNEL.get(base)
+        if channel is not None:
+            onehot[channel, position] = 1.0
+    return onehot
+
+
+def _sparse_or_dense_to_tensor(signal: Any) -> torch.Tensor:
+    """Convert dense tensors or sparse COO dicts from .pt/.pt.gz datasets."""
+    if torch.is_tensor(signal):
+        return signal.float()
+    if isinstance(signal, dict) and {"indices", "values", "size"} <= signal.keys():
+        indices = torch.as_tensor(signal["indices"], dtype=torch.long)
+        values = torch.as_tensor(signal["values"], dtype=torch.float32)
+        return torch.sparse_coo_tensor(indices, values, signal["size"]).to_dense()
+    raise TypeError(f"Unsupported output signal type: {type(signal).__name__}")
+
+
+def _sample_output_to_total(sample: dict[str, Any], output_key: str, seq_len: int) -> torch.Tensor:
+    """Extract one observed profile from a sample and name it ``outputs['total']``."""
+    outputs = sample.get("outputs", {})
+    if output_key not in outputs:
+        raise KeyError(
+            f"Output key {output_key!r} not found; available keys: {list(outputs.keys())}"
+        )
+
+    signal = _sparse_or_dense_to_tensor(outputs[output_key])
+    if signal.ndim == 1:
+        return _fit_length_1d(signal, seq_len)
+
+    if signal.ndim != 2:
+        raise ValueError(f"Expected 1D or 2D signal, got {tuple(signal.shape)}")
+
+    if signal.shape[-1] != seq_len and signal.shape[0] == seq_len:
+        signal = signal.T.contiguous()
+    if signal.shape[-1] != seq_len:
+        signal = torch.stack(
+            [_fit_length_1d(signal[track], seq_len) for track in range(signal.shape[0])],
+            dim=0,
+        )
+
+    # The globalCLIP files have one track. If a caller points this smoke test at
+    # an eCLIP-style multi-track key, keep the first track so the baseline still
+    # reconstructs one observed profile.
+    if signal.shape[0] > 1:
+        print(
+            f"Output key {output_key!r} has {signal.shape[0]} tracks; "
+            "using the first track for this one-profile smoke test."
+        )
+        signal = signal[:1, :]
+    return signal
+
+
+def _load_batch_from_pt_file(
+    dataset_path: Path,
+    split: str,
+    batch_size: int,
+    seq_len: int,
+    output_key: str,
+) -> dict[str, dict[str, torch.Tensor]]:
+    """Load the first batch directly from a .pt.gz/.pt dataset file.
+
+    This intentionally avoids parnet_additional_utils.GzListDataset. On the VM
+    described for this task, the checkpoint-compatible Parnet source contains
+    NewAdditiveMix but lacks parnet.data.datasets.ListDataset, which makes the
+    parnet_additional_utils dataset imports fail. Direct torch.load keeps this
+    smoke test independent from that dependency-version mismatch.
+    """
+    data = _load_pt_or_ptgz(dataset_path)
+    if split not in data:
+        available = [key for key in data if isinstance(data.get(key), list)]
+        raise KeyError(f"Split {split!r} not found in {dataset_path}; available: {available}")
+
+    split_data = data[split]
+    if len(split_data) == 0:
+        raise ValueError(f"Split {split!r} is empty in {dataset_path}")
+
+    samples = split_data[:batch_size]
+    sequences = []
+    totals = []
+    for sample in samples:
+        sequences.append(
+            _sequence_to_onehot(
+                sample["inputs"]["sequence"],
+                seq_len,
+                sample.get("meta", {}),
+            )
+        )
+        totals.append(_sample_output_to_total(sample, output_key, seq_len))
+
+    return {
+        "inputs": {"sequence": torch.stack(sequences, dim=0)},
+        "outputs": {"total": torch.stack(totals, dim=0)},
+    }
+
+
 def _load_globalclip_batch(
     args: argparse.Namespace,
     config: dict[str, Any],
@@ -96,26 +286,21 @@ def _load_globalclip_batch(
         return _synthetic_batch(args.batch_size, args.seq_length), dataset_path, False
 
     try:
-        from parnet_additional_utils import GzListDataset
-    except ModuleNotFoundError as exc:
+        batch = _load_batch_from_pt_file(
+            dataset_path,
+            args.split,
+            args.batch_size,
+            args.seq_length,
+            args.globalclip_key,
+        )
+    except Exception as exc:
         if args.strict_real_data:
             raise
-        print(f"parnet_additional_utils unavailable ({exc}); using a synthetic batch.")
+        print(f"Could not load real globalCLIP batch ({exc}); using a synthetic batch.")
         return _synthetic_batch(args.batch_size, args.seq_length), dataset_path, False
 
-    dataset = GzListDataset(
-        dataset_path,
-        split=args.split,
-        length=args.seq_length,
-        total_key=args.globalclip_key,
-        control_key=args.control_key,
-        shuffle=False,
-        return_meta=True,
-    )
-    loader = torch.utils.data.DataLoader(dataset, batch_size=args.batch_size, num_workers=0)
-    batch = next(iter(loader))
     print(f"Loaded real globalCLIP batch from: {dataset_path}")
-    print(f"  split={args.split}, dataset_size={len(dataset)}")
+    print(f"  split={args.split}, batch_size={batch['inputs']['sequence'].shape[0]}")
     return batch, dataset_path, True
 
 
@@ -134,21 +319,57 @@ def _load_pretrained_parnet(
         print(f"{message}; using synthetic Parnet profiles.")
         return None, model_path
 
+    model: torch.nn.Module | None = None
     try:
         from parnet_additional_utils import ParnetModelName, load_parnet_model
-    except ModuleNotFoundError as exc:
-        if args.strict_real_data:
-            raise
-        print(f"parnet_additional_utils unavailable ({exc}); using synthetic profiles.")
-        return None, model_path
+    except Exception as exc:
+        print(
+            "parnet_additional_utils model loader unavailable "
+            f"({type(exc).__name__}: {exc}); falling back to direct torch.load."
+        )
+    else:
+        try:
+            model_name = ParnetModelName(args.model_name)
+            model = load_parnet_model(
+                model_name,
+                model_path,
+                dtype=torch.float32,
+                device=device,
+            )
+        except Exception as exc:
+            print(
+                "parnet_additional_utils.load_parnet_model failed "
+                f"({type(exc).__name__}: {exc}); falling back to direct torch.load."
+            )
 
-    model_name = ParnetModelName(args.model_name)
-    model = load_parnet_model(
-        model_name,
-        model_path,
-        dtype=torch.float32,
-        device=device,
-    )
+    if model is None:
+        try:
+            # This fallback avoids dependency-version mismatch between
+            # parnet_additional_utils and the Parnet source needed to unpickle
+            # the checkpoint, for example when the checkpoint needs
+            # NewAdditiveMix but parnet_additional_utils expects
+            # parnet.data.datasets.ListDataset.
+            model = torch.load(model_path, map_location=device, weights_only=False)
+        except Exception as exc:
+            if args.strict_real_data:
+                raise
+            print(
+                "Direct torch.load of pretrained model failed "
+                f"({type(exc).__name__}: {exc}); using synthetic Parnet profiles."
+            )
+            return None, model_path
+
+        if not isinstance(model, torch.nn.Module):
+            message = (
+                "Direct checkpoint load did not return an nn.Module; "
+                f"got {type(model).__name__}"
+            )
+            if args.strict_real_data:
+                raise TypeError(message)
+            print(f"{message}; using synthetic Parnet profiles.")
+            return None, model_path
+
+    model = model.to(device)
     model.eval()
     for parameter in model.parameters():
         parameter.requires_grad_(False)
