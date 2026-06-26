@@ -408,22 +408,40 @@ def _extract_rbp_profiles(
         )
 
     with torch.no_grad():
-        output = model(sequence)
+        # The checkpoint-compatible Parnet source expects dictionary inputs and
+        # indexes inputs["sequence"] inside forward.
+        output = model({"sequence": sequence})
 
     print("Parnet output shapes:")
-    for key, value in output.items():
-        if torch.is_tensor(value):
-            print(f"  {key}: {tuple(value.shape)}")
-        else:
-            print(f"  {key}: {type(value).__name__}")
+    if isinstance(output, dict):
+        for key, value in output.items():
+            if torch.is_tensor(value):
+                print(f"  {key}: {tuple(value.shape)}")
+            else:
+                print(f"  {key}: {type(value).__name__}")
 
-    if args.profile_key not in output:
-        raise KeyError(
-            f"Parnet output does not contain {args.profile_key!r}; "
-            f"available keys: {list(output.keys())}"
+        if args.profile_key not in output:
+            available = list(output.keys())
+            print(f"Requested Parnet output key {args.profile_key!r} not found.")
+            print(f"Available Parnet output keys: {available}")
+            raise KeyError(
+                f"Parnet output does not contain {args.profile_key!r}; "
+                f"available keys: {available}"
+            )
+        profile_logprob = output[args.profile_key]
+        output_label = f"out[{args.profile_key!r}]"
+    elif torch.is_tensor(output):
+        print(f"  tensor: {tuple(output.shape)}")
+        profile_logprob = output
+        output_label = "tensor output"
+    else:
+        raise TypeError(f"Unsupported Parnet output type: {type(output).__name__}")
+
+    if not torch.is_tensor(profile_logprob):
+        raise TypeError(
+            f"Expected Parnet profile output to be a tensor, "
+            f"got {type(profile_logprob).__name__}"
         )
-
-    profile_logprob = output[args.profile_key]
     if profile_logprob.ndim != 3:
         raise ValueError(
             f"Expected Parnet {args.profile_key!r} output to be 3D, "
@@ -432,7 +450,7 @@ def _extract_rbp_profiles(
 
     profile_prob = profile_logprob.exp()
     sums = profile_prob.sum(dim=-1)
-    print(f"Using Parnet output: out[{args.profile_key!r}].exp()")
+    print(f"Using Parnet output: {output_label}.exp()")
     print(
         "  profile probability sums over length: "
         f"min={sums.min().item():.6f}, max={sums.max().item():.6f}"
