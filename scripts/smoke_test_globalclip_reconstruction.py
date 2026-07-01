@@ -40,6 +40,7 @@ _BASE_TO_CHANNEL = {
     "G": 2,
     "T": 3,
 }
+_CONTROL_HANDLING = "ignored_for_idea1_reconstruction_head_v1"
 
 
 def _default_config_path() -> Path:
@@ -557,6 +558,8 @@ def main() -> None:
     sequence = batch["inputs"]["sequence"].float().to(device)
     print(f"Input sequence shape        : {tuple(sequence.shape)}")
     print(f"Using real globalCLIP batch : {real_batch}")
+    print("Controls used               : false")
+    print(f"Control handling            : {_CONTROL_HANDLING}")
 
     parnet_model, _ = _load_pretrained_parnet(args, config, device)
     rbp_profiles = _extract_rbp_profiles(parnet_model, sequence, args, device)
