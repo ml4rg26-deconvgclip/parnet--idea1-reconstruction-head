@@ -295,8 +295,16 @@ def _extract_parnet_profiles(
     """Run frozen Parnet and return selected probability profiles."""
     with torch.no_grad():
         # Checkpoint-compatible Parnet expects a dict and reads inputs["sequence"].
-        output = model({"sequence": sequence})
-
+        # Parnet forward API differs across versions: some expect
+        # a dict {"sequence": sequence}, while this VM's installed
+        # parnet package expects the sequence tensor directly.
+        try:
+            output = model({"sequence": sequence})
+        except TypeError as exc:
+            if "conv1d()" in str(exc) or "invalid combination of arguments" in str(exc):
+                output = model(sequence)
+            else:
+                raise
     if isinstance(output, dict):
         if profile_key not in output:
             available = list(output.keys())

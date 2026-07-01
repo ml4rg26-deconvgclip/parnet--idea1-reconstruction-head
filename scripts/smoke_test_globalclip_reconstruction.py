@@ -410,8 +410,16 @@ def _extract_rbp_profiles(
     with torch.no_grad():
         # The checkpoint-compatible Parnet source expects dictionary inputs and
         # indexes inputs["sequence"] inside forward.
-        output = model({"sequence": sequence})
-
+        # Parnet forward API differs across versions: some expect
+        # a dict {"sequence": sequence}, while this VM's installed
+        # parnet package expects the sequence tensor directly.
+        try:
+            output = model({"sequence": sequence})
+        except TypeError as exc:
+            if "conv1d()" in str(exc) or "invalid combination of arguments" in str(exc):
+                output = model(sequence)
+            else:
+                raise
     print("Parnet output shapes:")
     if isinstance(output, dict):
         for key, value in output.items():
