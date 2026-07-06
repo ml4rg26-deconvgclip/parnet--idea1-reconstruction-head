@@ -1,0 +1,22 @@
+{
+  "baseline": {
+    "mean_r": 0.18915854764426418,
+    "median_r": 0.1787826269865036,
+    "std_r": 0.08801879674737739
+  },
+  "standard": {
+    "mean_r": 0.2656454988927343,
+    "median_r": 0.25479280948638916,
+    "std_r": 0.11102253480468718
+  },
+  "qlayer": {
+    "mean_r": 0.40866725116607544,
+    "median_r": 0.4080764502286911,
+    "std_r": 0.16281360245729154
+  },
+  "significance_wilcoxon_p": {
+    "standard_vs_baseline": 0.0,
+    "qlayer_vs_baseline": 0.0,
+    "qlayer_vs_standard": 0.0
+  }
+}

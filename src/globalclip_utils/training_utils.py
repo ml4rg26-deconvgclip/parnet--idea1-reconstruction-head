@@ -109,11 +109,12 @@ class GlobalCLIPLightningModule(pl.LightningModule):
     def _shared_step(self, batch: dict, prefix: str) -> torch.Tensor:
         seq     = batch["sequence"]   # (B, 4, L)
         signal  = batch["signal"]     # (B, 1, L)
-        control = batch["control"]    # (B, 1, L)
+        # control = batch["control"]  # (B, 1, L) — not used
 
         pred, alpha = self.model(seq)
 
-        target = compute_log_enrichment(signal, control)       # (B, 1, L)
+        # target = compute_log_enrichment(signal, control)     # (B, 1, L) — not used
+        target = torch.log1p(signal)                           # (B, 1, L)
 
         loss_p = pearson_loss(pred, target)
         loss_n = multinomial_nll_loss(pred, signal)

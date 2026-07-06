@@ -5,6 +5,7 @@ channels = ["rapidsai", "conda-forge", "bioconda"]
 name = "parnet--unified"
 platforms = ["linux-64"]
 version = "0.1.0"
+conda-pypi-map = {}
 
 [tasks]
 
@@ -210,7 +211,7 @@ platforms = ["linux-64"]
 system-requirements = { cuda = "12.8" }
 
 [feature.parnet-gpu-cu12.dependencies]
-
+python = ">=3.10,<3.11"
 # cuda-version pins conda CUDA libs for cupy; no pytorch-gpu (installed via PyPI below).
 cuda-version = "12.8.*"
 cupy = ">=13.6.0,<14"
@@ -270,11 +271,28 @@ metamotif               = { path = "externals/metamotif",               editable
 
 # ===============================================================
 
-[environments]
+#[environments]
 
-parnet-dev            = ["parnet-all", "parnet-cpu",      "parnet-libs-git",   "bio", "jupyter", "dev"]
-parnet-dev-local      = ["parnet-all", "parnet-cpu",      "parnet-libs-local", "bio", "jupyter", "dev"]
-parnet-dev-cu11       = ["parnet-all", "parnet-gpu-cu11", "parnet-libs-git",   "bio", "jupyter", "dev"]
-parnet-dev-cu11-local = ["parnet-all", "parnet-gpu-cu11", "parnet-libs-local", "bio", "jupyter", "dev"]
-parnet-dev-cu12       = ["parnet-gpu-cu12", "parnet-libs-git",   "bio", "jupyter", "dev"]
-parnet-dev-cu12-local = ["parnet-gpu-cu12", "parnet-libs-local", "bio", "jupyter", "dev"]
+#parnet-dev            = ["parnet-all", "parnet-cpu",      "parnet-libs-git",   "bio", "jupyter", "dev"]
+#parnet-dev-local      = ["parnet-all", "parnet-cpu",      "parnet-libs-local", "bio", "jupyter", "dev"]
+#parnet-dev-cu11       = ["parnet-all", "parnet-gpu-cu11", "parnet-libs-git",   "bio", "jupyter", "dev"]
+#parnet-dev-cu11-local = ["parnet-all", "parnet-gpu-cu11", "parnet-libs-local", "bio", "jupyter", "dev"]
+#parnet-dev-cu12       = ["parnet-gpu-cu12", "parnet-libs-git",   "bio", "jupyter", "dev"]
+#parnet-dev-cu12-local = ["parnet-gpu-cu12", "parnet-libs-local", "bio", "jupyter", "dev"]
+
+[environments]
+#parnet-dev            = {features = ["parnet-all", "parnet-cpu",      "parnet-libs-git",   "bio", "jupyter", "dev"], solve-group = "cpu"}
+#parnet-dev-local      = {features = ["parnet-all", "parnet-cpu",      "parnet-libs-local", "bio", "jupyter", "dev"], solve-group = "cpu"}
+#parnet-dev-cu11       = {features = ["parnet-all", "parnet-gpu-cu11", "parnet-libs-git",   "bio", "jupyter", "dev"], solve-group = "cu11"}
+#parnet-dev-cu11-local = {features = ["parnet-all", "parnet-gpu-cu11", "parnet-libs-local", "bio", "jupyter", "dev"], solve-group = "cu11"}
+#parnet-dev-cu12       = {features = ["parnet-gpu-cu12", "parnet-libs-git",   "bio", "jupyter", "dev"], solve-group = "cu12"}
+#parnet-dev-cu12-local = {features = ["parnet-gpu-cu12", "parnet-libs-local", "bio", "jupyter", "dev"], solve-group = "cu12"}
+#rinalmo-dev-cu12      = {features = ["rinalmo-cu12", "parnet-libs-git",   "bio", "jupyter", "dev"], solve-group = "cu12"}
+#rinalmo-dev-cu12-local = {features = ["rinalmo-cu12", "parnet-libs-local", "bio", "jupyter", "dev"], solve-group = "cu12"}
+#spliceai-cu12         = {features = ["spliceai-cu12", "pylbsr-git", "bio", "jupyter", "dev"], solve-group = "cu12"}
+#smk-dev-cu12          = {features = ["smk-cu12", "bio", "parnet-libs-git"], solve-group = "cu12"}
+#smk-dev-cu12-local    = {features = ["smk-cu12", "bio", "parnet-libs-local"], solve-group = "cu12"}
+parnet-dev-cu12  = {features = ["parnet-gpu-cu12", "parnet-libs-git", "bio", "jupyter", "dev"], solve-group = "cu12"}
+
+[activation]
+env = {LD_LIBRARY_PATH = "$CONDA_PREFIX/lib:$LD_LIBRARY_PATH"}

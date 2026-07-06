@@ -89,13 +89,21 @@ class GlobalCLIPDataset(torch.utils.data.Dataset):
         elem = self.samples[idx]
 
         seq_onehot = _seq_to_onehot(elem["inputs"]["sequence"], self.seq_len)
-        signal = torch_sparse_to_dense(elem["outputs"][self.total_key]).float()    # (1, L)
-        control = torch_sparse_to_dense(elem["outputs"]["control"]).float()        # (1, L)
+        signal = torch_sparse_to_dense(elem["outputs"][self.total_key]).float()    # (1, L_orig)
+        # Ensure signal length matches seq_len (pad or truncate)
+        L = signal.shape[-1]
+        if L > self.seq_len:
+            signal = signal[..., :self.seq_len]
+        elif L < self.seq_len:
+            import torch.nn.functional as F
+            signal = F.pad(signal, (0, self.seq_len - L))
+        signal = signal.clone()
+        # control = torch_sparse_to_dense(elem["outputs"]["control"]).float()      # (1, L) — not used
 
         return {
             "sequence": seq_onehot,   # (4, L)
             "signal": signal,         # (1, L)
-            "control": control,       # (1, L)
+            # "control": control,     # (1, L) — not used
         }
 
 

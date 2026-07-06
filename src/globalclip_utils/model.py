@@ -112,7 +112,7 @@ def _extract_parnet_features(
     if hasattr(parnet_model, "projection"):
         x = parnet_model.projection(x)          # identity after load_parnet_model
     embedding = x
-    rbp_tracks = parnet_model.head.head_target.pointwise(x)  # (B, 223, L)
+    rbp_tracks = parnet_model.head.head_target.pointwise_conv(x)  # (B, 223, L)
     return embedding, rbp_tracks
 
 

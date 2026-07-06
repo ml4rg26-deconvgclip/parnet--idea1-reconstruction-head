@@ -115,10 +115,11 @@ def evaluate_pearson(
     for batch in dataloader:
         seq     = batch["sequence"].to(device)
         signal  = batch["signal"].to(device)
-        control = batch["control"].to(device)
+        # control = batch["control"].to(device)  # not used
 
         pred, _ = model(seq)
-        target = _log_enrichment(signal, control)
+        # target = _log_enrichment(signal, control)  # not used
+        target = torch.log1p(signal)
 
         p = pred.squeeze(1)
         t = target.squeeze(1)

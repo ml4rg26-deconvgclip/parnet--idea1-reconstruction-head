@@ -1,0 +1,10 @@
+dataset,split,n_samples,signal_mean,signal_median
+interphase,valid,7361,106.66471946746366,41.0
+interphase,train,39052,165.04150875755403,44.0
+interphase,test,4946,92.59199353012535,43.0
+lysate_NHS,valid,7361,106.66471946746366,41.0
+lysate_NHS,train,39052,165.04150875755403,44.0
+lysate_NHS,test,4946,92.59199353012535,43.0
+lysate_noNHS,valid,7361,106.66471946746366,41.0
+lysate_noNHS,train,39052,165.04150875755403,44.0
+lysate_noNHS,test,4946,92.59199353012535,43.0

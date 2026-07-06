@@ -1,0 +1,4 @@
+lambda_alpha: 5.0
+lambda_nll: 0.3
+lambda_phase: 0.01
+lr: 0.0003
