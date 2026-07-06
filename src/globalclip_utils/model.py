@@ -63,7 +63,13 @@ class QLayer(nn.Module):
 
     def __init__(self, num_rbps: int = 223):
         super().__init__()
-        self.phase = nn.Parameter(torch.zeros(num_rbps))
+        # NOTE: must NOT init all phases to exactly 0 — at phi=0 for every
+        # protein, imag = sum(amp_i * sin(0)) = 0 identically, which makes
+        # dI/dphi_j = 2*real*(-amp_j*sin(0)) + 2*imag*(amp_j*cos(0)) = 0 for
+        # every j regardless of the data. That's an exact saddle point, so
+        # phase never moves away from 0 during training. Small random init
+        # breaks the symmetry so gradients can flow from step 0.
+        self.phase = nn.Parameter(torch.randn(num_rbps) * 0.1)
 
     def forward(self, rbp_tracks: torch.Tensor, alpha: torch.Tensor) -> torch.Tensor:
         """
