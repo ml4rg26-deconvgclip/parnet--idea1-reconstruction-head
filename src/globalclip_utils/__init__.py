@@ -3,6 +3,7 @@
 from .model import (
     GlobalCLIPStandardModel,
     GlobalCLIPQLayerModel,
+    GlobalCLIPCNNModel,
     MixCoeffHead,
     QLayer,
 )
@@ -30,6 +31,7 @@ from .analysis_utils import (
 __all__ = [
     "GlobalCLIPStandardModel",
     "GlobalCLIPQLayerModel",
+    "GlobalCLIPCNNModel",
     "MixCoeffHead",
     "QLayer",
     "GlobalCLIPDataset",

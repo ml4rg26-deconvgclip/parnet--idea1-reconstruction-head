@@ -1,19 +1,23 @@
-"""Train GlobalCLIPStandardModel (MixCoeffHead + log_scale).
+"""Train GlobalCLIPCNNModel (Standard mixing + dilated CNN, no QLayer interference).
+
+Ablation: isolates whether the dilated-CNN refinement stage alone accounts
+for QLayer's advantage over the Standard model, or whether the phase-based
+interference step also contributes. Compare this run's test-set Pearson r
+directly against Standard (no CNN) and QLayer (CNN + interference).
 
 Usage:
-    pixi run -e parnet-dev-cu12 python scripts/train_standard.py
-    pixi run -e parnet-dev-cu12 python scripts/train_standard.py --lr 3e-4 --run-id v2
+    pixi run -e parnet-dev-cu12 python scripts/train_cnn_only.py
+    pixi run -e parnet-dev-cu12 python scripts/train_cnn_only.py --positional-alpha --run-id v1
 """
 from __future__ import annotations
 
 import argparse
-import json
 import logging
 import sys
 from pathlib import Path
 
 import matplotlib
-matplotlib.use("Agg")  # no display needed
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 import torch
@@ -31,7 +35,7 @@ from parnet_additional_utils import ParnetModelName, load_parnet_model
 from globalclip_utils import (
     GlobalCLIPDataset,
     GlobalCLIPLightningModule,
-    GlobalCLIPStandardModel,
+    GlobalCLIPCNNModel,
     save_run_config,
 )
 
@@ -46,15 +50,18 @@ log = logging.getLogger(__name__)
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser()
-    p.add_argument("--run-id",        default="globalclip.standard.v1")
+    p.add_argument("--run-id",        default="globalclip.cnn_only.v1")
     p.add_argument("--dataset",       default="globalclip_lysate_noNHS")
-    p.add_argument("--lr",            type=float, default=3e-4)
+    p.add_argument("--lr",            type=float, default=1e-4)
     p.add_argument("--max-epochs",    type=int,   default=50)
     p.add_argument("--batch-size",    type=int,   default=64)
     p.add_argument("--num-workers",   type=int,   default=4)
     p.add_argument("--mix-hidden",    type=int,   default=128)
-    p.add_argument("--lambda-nll",    type=float, default=0.3)
-    p.add_argument("--lambda-alpha",  type=float, default=5.0)
+    p.add_argument("--cnn-channels",  type=int,   default=64)
+    p.add_argument("--cnn-kernel",    type=int,   default=9)
+    p.add_argument("--cnn-layers",    type=int,   default=3)
+    p.add_argument("--lambda-nll",    type=float, default=0.1)
+    p.add_argument("--lambda-alpha",  type=float, default=0.1)
     p.add_argument("--patience",      type=int,   default=8)
     p.add_argument("--gpu",           type=int,   default=0)
     p.add_argument("--seq-len",       type=int,   default=600)
@@ -87,13 +94,14 @@ def main() -> None:
     fp = DotMap()
     fp.pretrained_model = _res(_fp_cfg["models"][pretrained_model_name.value])
     fp.dataset          = _res(_fp_cfg["data"][args.dataset]["pt"])
-    fp.output_dir       = PROJECT_DIR / _fp_cfg["results"]["standard_model"] / args.run_id
+    fp.output_dir       = PROJECT_DIR / "results" / "globalclip" / "cnn_only" / args.run_id
     fp.output_dir.mkdir(parents=True, exist_ok=True)
 
     log.info(f"Run ID        : {args.run_id}")
     log.info(f"Dataset       : {fp.dataset}")
     log.info(f"Output dir    : {fp.output_dir}")
     log.info(f"Learning rate : {args.lr}")
+    log.info(f"Positional α  : {args.positional_alpha}")
 
     # ── Data ──────────────────────────────────────────────────────────────────
     train_ds = GlobalCLIPDataset(fp.dataset, split="train",
@@ -118,18 +126,26 @@ def main() -> None:
                                dtype=torch.float32, device=device)
     parnet.eval()
 
-    model = GlobalCLIPStandardModel(
+    model = GlobalCLIPCNNModel(
         parnet_model=parnet,
         num_rbps=args.num_rbps,
         mix_hidden=args.mix_hidden,
+        cnn_channels=args.cnn_channels,
+        cnn_kernel=args.cnn_kernel,
+        cnn_layers=args.cnn_layers,
         positional_alpha=args.positional_alpha,
     ).to(device)
 
     trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
     total     = sum(p.numel() for p in model.parameters())
     log.info(f"Parameters: {trainable:,} trainable / {total:,} total")
+    log.info(f"  MixCoeffHead : {sum(p.numel() for p in model.mix_coeff.parameters()):,}")
+    log.info(f"  CNN          : {sum(p.numel() for p in model.cnn.parameters()):,}")
 
     # ── Train ─────────────────────────────────────────────────────────────────
+    # No lambda_phase: GlobalCLIPCNNModel has no `qlayer` attribute, so
+    # GlobalCLIPLightningModule's `hasattr(self.model, "qlayer")` check
+    # automatically skips the phase-regularization term.
     lightning_model = GlobalCLIPLightningModule(
         model=model,
         lr=args.lr,
@@ -169,20 +185,23 @@ def main() -> None:
     torch.save(model, fp.output_dir / "model.full.pt")
 
     run_cfg = {
-        "model_type":            "GlobalCLIPStandardModel",
-        "pretrained_model_name": pretrained_model_name.value,
-        "control_dataset":       args.dataset,
-        "params_seq_length":     args.seq_len,
-        "params_batch_size":     args.batch_size,
-        "params_num_rbps":       args.num_rbps,
-        "params_mix_hidden":     args.mix_hidden,
+        "model_type":              "GlobalCLIPCNNModel",
+        "pretrained_model_name":   pretrained_model_name.value,
+        "control_dataset":         args.dataset,
+        "params_seq_length":       args.seq_len,
+        "params_batch_size":       args.batch_size,
+        "params_num_rbps":         args.num_rbps,
+        "params_mix_hidden":       args.mix_hidden,
+        "params_cnn_channels":     args.cnn_channels,
+        "params_cnn_kernel":       args.cnn_kernel,
+        "params_cnn_layers":       args.cnn_layers,
         "params_positional_alpha": args.positional_alpha,
-        "params_lr":             args.lr,
-        "params_max_epochs":     args.max_epochs,
-        "params_lambda_nll":     args.lambda_nll,
-        "params_lambda_alpha":   args.lambda_alpha,
-        "dataset_path":          str(fp.dataset),
-        "output_dir":            str(fp.output_dir),
+        "params_lr":               args.lr,
+        "params_max_epochs":       args.max_epochs,
+        "params_lambda_nll":       args.lambda_nll,
+        "params_lambda_alpha":     args.lambda_alpha,
+        "dataset_path":            str(fp.dataset),
+        "output_dir":              str(fp.output_dir),
     }
     save_run_config(fp.output_dir, run_cfg)
     log.info(f"Model and config saved to {fp.output_dir}")

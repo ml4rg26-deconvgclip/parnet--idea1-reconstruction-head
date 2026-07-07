@@ -20,15 +20,35 @@ import torch.nn as nn
 class MixCoeffHead(nn.Module):
     """Sequence-dependent mixing coefficients.
 
-    Mean-pools the PARNET embedding over positions, then projects to
-    (B, num_tasks) sigmoid mixing weights.
+    Two modes:
+      - global (positional=False, original behaviour): mean-pools the
+        PARNET embedding over all positions first, then projects to a
+        single (B, num_tasks) sigmoid weight vector per sequence. This
+        means the model can only pick one RBP mixture for the entire
+        600bp window, even though the underlying binding signal is known
+        to vary along the sequence.
+      - positional (positional=True): applies the same MLP at every
+        position independently (via 1x1 convs), producing
+        (B, num_tasks, L) weights that can vary along the sequence --
+        letting different sub-regions be dominated by different RBPs.
     """
 
-    def __init__(self, embed_dim: int = 512, num_tasks: int = 223, hidden: int = 128):
+    def __init__(
+        self,
+        embed_dim: int = 512,
+        num_tasks: int = 223,
+        hidden: int = 128,
+        positional: bool = False,
+    ):
         super().__init__()
-        self.fc1 = nn.Linear(embed_dim, hidden)
+        self.positional = positional
+        if positional:
+            self.fc1 = nn.Conv1d(embed_dim, hidden, kernel_size=1)
+            self.fc2 = nn.Conv1d(hidden, num_tasks, kernel_size=1)
+        else:
+            self.fc1 = nn.Linear(embed_dim, hidden)
+            self.fc2 = nn.Linear(hidden, num_tasks)
         self.act = nn.ReLU()
-        self.fc2 = nn.Linear(hidden, num_tasks)
 
     def forward(self, embedding: torch.Tensor) -> torch.Tensor:
         """
@@ -36,8 +56,12 @@ class MixCoeffHead(nn.Module):
             embedding: (B, embed_dim, L) backbone feature map.
 
         Returns:
-            alpha: (B, num_tasks) mixing coefficients in [0, 1].
+            alpha: (B, num_tasks) mixing coefficients in [0, 1] if
+                   positional=False, or (B, num_tasks, L) if
+                   positional=True.
         """
+        if self.positional:
+            return torch.sigmoid(self.fc2(self.act(self.fc1(embedding))))  # (B, T, L)
         x = embedding.mean(dim=-1)                          # (B, D)
         return torch.sigmoid(self.fc2(self.act(self.fc1(x))))  # (B, T)
 
@@ -80,7 +104,9 @@ class QLayer(nn.Module):
         Returns:
             interference: (B, 1, L) |Ψ|² interference pattern.
         """
-        amp = rbp_tracks * alpha[:, :, None]                       # (B, R, L)
+        if alpha.dim() == 2:
+            alpha = alpha[:, :, None]                               # (B, R) -> (B, R, 1)
+        amp = rbp_tracks * alpha                                    # (B, R, L)
         phi = self.phase                                            # (R,)
         real = (amp * torch.cos(phi)[None, :, None]).sum(1)        # (B, L)
         imag = (amp * torch.sin(phi)[None, :, None]).sum(1)        # (B, L)
@@ -149,13 +175,16 @@ class GlobalCLIPStandardModel(nn.Module):
         parnet_model: nn.Module,
         num_rbps: int = 223,
         mix_hidden: int = 128,
+        positional_alpha: bool = False,
     ):
         super().__init__()
         self.backbone = parnet_model
         for p in self.backbone.parameters():
             p.requires_grad = False
 
-        self.mix_coeff = MixCoeffHead(embed_dim=512, num_tasks=num_rbps, hidden=mix_hidden)
+        self.mix_coeff = MixCoeffHead(
+            embed_dim=512, num_tasks=num_rbps, hidden=mix_hidden, positional=positional_alpha
+        )
         self.log_scale = nn.Parameter(torch.zeros(num_rbps))
 
     def forward(
@@ -168,15 +197,22 @@ class GlobalCLIPStandardModel(nn.Module):
         Returns:
             pred:  (B, 1, L) predicted GlobalCLIP track.
             alpha: (B, num_rbps) mixing coefficients (for analysis / IG).
+                   If the mixing head is positional, this is the
+                   per-position weights averaged over L, so downstream
+                   analysis code (ranking, correlation) keeps working
+                   unchanged; the position-resolved weights are still
+                   used internally to compute `pred`.
         """
         with torch.no_grad():
             embedding, rbp_tracks = _extract_parnet_features(self.backbone, seq_onehot)
 
-        alpha = self.mix_coeff(embedding)                          # (B, 223)
+        alpha = self.mix_coeff(embedding)                          # (B, 223) or (B, 223, L)
         scale = self.log_scale.exp()                               # (223,)
         scaled = rbp_tracks * scale[None, :, None]                 # (B, 223, L)
-        pred = (scaled * alpha[:, :, None]).sum(1, keepdim=True)   # (B, 1, L)
-        return pred, alpha
+        alpha_bc = alpha[:, :, None] if alpha.dim() == 2 else alpha
+        pred = (scaled * alpha_bc).sum(1, keepdim=True)             # (B, 1, L)
+        alpha_out = alpha if alpha.dim() == 2 else alpha.mean(dim=-1)
+        return pred, alpha_out
 
     def effective_weights(self, seq_onehot: torch.Tensor) -> torch.Tensor:
         """Effective contribution per protein: alpha * exp(log_scale).
@@ -221,13 +257,16 @@ class GlobalCLIPQLayerModel(nn.Module):
         cnn_channels: int = 64,
         cnn_kernel: int = 9,
         cnn_layers: int = 3,
+        positional_alpha: bool = False,
     ):
         super().__init__()
         self.backbone = parnet_model
         for p in self.backbone.parameters():
             p.requires_grad = False
 
-        self.mix_coeff = MixCoeffHead(embed_dim=512, num_tasks=num_rbps, hidden=mix_hidden)
+        self.mix_coeff = MixCoeffHead(
+            embed_dim=512, num_tasks=num_rbps, hidden=mix_hidden, positional=positional_alpha
+        )
         self.log_scale = nn.Parameter(torch.zeros(num_rbps))
         self.qlayer = QLayer(num_rbps=num_rbps)
 
@@ -259,14 +298,80 @@ class GlobalCLIPQLayerModel(nn.Module):
         with torch.no_grad():
             embedding, rbp_tracks = _extract_parnet_features(self.backbone, seq_onehot)
 
-        alpha = self.mix_coeff(embedding)                         # (B, 223)
+        alpha = self.mix_coeff(embedding)                         # (B, 223) or (B, 223, L)
         scale = self.log_scale.exp()                              # (223,)
         scaled = rbp_tracks * scale[None, :, None]                # (B, 223, L)
 
         interference = self.qlayer(scaled, alpha)                 # (B, 1, L)
         pred = self.cnn(interference)                             # (B, 1, L)
-        return pred, alpha
+        alpha_out = alpha if alpha.dim() == 2 else alpha.mean(dim=-1)
+        return pred, alpha_out
 
     def get_coupling_matrix(self) -> torch.Tensor:
         """(num_rbps, num_rbps) pairwise coupling cos(φ_i − φ_j)."""
         return self.qlayer.coupling_matrix()
+
+
+# ── Model 3: CNN-only ablation (no QLayer interference) ──────────────────────
+
+
+class GlobalCLIPCNNModel(nn.Module):
+    """Ablation model: Standard weighted-sum mixing, refined directly by the
+    same dilated CNN used in GlobalCLIPQLayerModel -- but with no QLayer
+    interference step in between.
+
+    Purpose: QLayer outperforms the Standard model mostly because of the
+    dilated-CNN refinement stage, not the phase-interference mechanism
+    (see Results). This model isolates that CNN contribution on its own,
+    so it can be compared directly against both GlobalCLIPStandardModel
+    (no CNN) and GlobalCLIPQLayerModel (CNN + interference) to determine
+    how much of the improvement the interference step actually adds.
+    """
+
+    def __init__(
+        self,
+        parnet_model: nn.Module,
+        num_rbps: int = 223,
+        mix_hidden: int = 128,
+        cnn_channels: int = 64,
+        cnn_kernel: int = 9,
+        cnn_layers: int = 3,
+        positional_alpha: bool = False,
+    ):
+        super().__init__()
+        self.backbone = parnet_model
+        for p in self.backbone.parameters():
+            p.requires_grad = False
+
+        self.mix_coeff = MixCoeffHead(
+            embed_dim=512, num_tasks=num_rbps, hidden=mix_hidden, positional=positional_alpha
+        )
+        self.log_scale = nn.Parameter(torch.zeros(num_rbps))
+
+        layers: list[nn.Module] = []
+        in_ch = 1
+        for i in range(cnn_layers):
+            dil = 2 ** i
+            pad = dil * (cnn_kernel // 2)
+            layers += [
+                nn.Conv1d(in_ch, cnn_channels, kernel_size=cnn_kernel, padding=pad, dilation=dil),
+                nn.ReLU(),
+            ]
+            in_ch = cnn_channels
+        layers.append(nn.Conv1d(cnn_channels, 1, kernel_size=1))
+        self.cnn = nn.Sequential(*layers)
+
+    def forward(
+        self, seq_onehot: torch.Tensor
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        with torch.no_grad():
+            embedding, rbp_tracks = _extract_parnet_features(self.backbone, seq_onehot)
+
+        alpha = self.mix_coeff(embedding)                         # (B, 223) or (B, 223, L)
+        scale = self.log_scale.exp()                              # (223,)
+        scaled = rbp_tracks * scale[None, :, None]                # (B, 223, L)
+        alpha_bc = alpha[:, :, None] if alpha.dim() == 2 else alpha
+        mixed = (scaled * alpha_bc).sum(1, keepdim=True)          # (B, 1, L) — same as Standard model
+        pred = self.cnn(mixed)                                    # (B, 1, L)
+        alpha_out = alpha if alpha.dim() == 2 else alpha.mean(dim=-1)
+        return pred, alpha_out

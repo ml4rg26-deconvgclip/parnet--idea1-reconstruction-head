@@ -62,6 +62,9 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--gpu",           type=int,   default=0)
     p.add_argument("--seq-len",       type=int,   default=600)
     p.add_argument("--num-rbps",      type=int,   default=223)
+    p.add_argument("--positional-alpha", action="store_true",
+                    help="Predict per-position mixing weights (B,223,L) instead of "
+                         "one global weight vector per sequence (B,223).")
     return p.parse_args()
 
 
@@ -125,6 +128,7 @@ def main() -> None:
         cnn_channels=args.cnn_channels,
         cnn_kernel=args.cnn_kernel,
         cnn_layers=args.cnn_layers,
+        positional_alpha=args.positional_alpha,
     ).to(device)
 
     trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
@@ -185,6 +189,7 @@ def main() -> None:
         "params_cnn_channels":   args.cnn_channels,
         "params_cnn_kernel":     args.cnn_kernel,
         "params_cnn_layers":     args.cnn_layers,
+        "params_positional_alpha": args.positional_alpha,
         "params_lr":             args.lr,
         "params_max_epochs":     args.max_epochs,
         "params_lambda_nll":     args.lambda_nll,
