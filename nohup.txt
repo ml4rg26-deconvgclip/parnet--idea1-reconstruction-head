@@ -1,0 +1,201 @@
+## Training starten (beide Modelle nacheinander)
+
+# Im JupyterLab Terminal auf dem Server:
+
+export PIXI_CACHE_DIR="$HOME/.pixi-cache"
+
+nohup bash -c '
+export PIXI_CACHE_DIR="$HOME/.pixi-cache"
+cd /mnt/storage1/workspace/pgoldemund/parnet--idea1-reconstruction-head
+pixi run -e parnet-dev-cu12 python scripts/train_standard.py --lr 1e-4 --lambda-alpha 0.1 --lambda-nll 0.1 --run-id globalclip.standard.v3 --gpu 0 && \
+pixi run -e parnet-dev-cu12 python scripts/train_qlayer.py --lr 1e-4 --lambda-alpha 0.1 --lambda-nll 0.1 --run-id globalclip.qlayer.v1 --gpu 0
+' > logs/train_all.log 2>&1 &
+
+
+## Log verfolgen
+
+tail -f logs/train_all.log
+
+
+## Prüfen ob Training noch läuft
+
+ps aux | grep train_standard
+ps aux | grep train_qlayer
+
+
+## Letzte 50 Zeilen des Logs anzeigen (nach Reconnect)
+
+tail -n 50 logs/train_all.log
+
+
+## Nur Standard-Modell starten
+
+nohup bash -c '
+export PIXI_CACHE_DIR="$HOME/.pixi-cache"
+cd /mnt/storage1/workspace/pgoldemund/parnet--idea1-reconstruction-head
+pixi run -e parnet-dev-cu12 python scripts/train_standard.py --lr 1e-4 --lambda-alpha 0.1 --lambda-nll 0.1 --run-id globalclip.standard.v3 --gpu 0
+' > logs/train_standard_v3.log 2>&1 &
+
+
+## Nur QLayer-Modell starten
+
+nohup bash -c '
+export PIXI_CACHE_DIR="$HOME/.pixi-cache"
+cd /mnt/storage1/workspace/pgoldemund/parnet--idea1-reconstruction-head
+pixi run -e parnet-dev-cu12 python scripts/train_qlayer.py --lr 1e-4 --lambda-alpha 0.1 --lambda-nll 0.1 --run-id globalclip.qlayer.v1 --gpu 0
+' > logs/train_qlayer_v1.log 2>&1 &
+
+
+## Parameter-Optionen
+
+# --lr            Lernrate (default: 1e-4)
+# --lambda-alpha  Sparsity-Penalty auf alpha (default: 0.1)
+# --lambda-nll    Gewicht des NLL-Terms (default: 0.1)
+# --run-id        Name des Runs / Output-Ordner
+# --gpu           GPU-Index (0 oder 1)
+# --batch-size    Batch-Groesse (default: 64)
+# --max-epochs    Max. Epochen (default: 50)
+# --patience      Early-Stopping Geduld (default: 8)
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## Experimente: positionsabhaengiges Alpha + CNN-only Ablation
+## ─────────────────────────────────────────────────────────────────────────
+
+# Kontext:
+# - QLayer v1 hatte einen Phasen-Init-Bug (alle phi=0 -> exakter
+#   Sattelpunkt, kein Gradient). Gefixt in QLayer.__init__ (model.py):
+#   phase = nn.Parameter(torch.randn(num_rbps) * 0.1) statt torch.zeros(...).
+# - Nach dem Fix (QLayer v2) blieb die Performance praktisch gleich
+#   (r=0.409 -> 0.407). D.h. der Vorsprung von QLayer ggue. Standard kommt
+#   vermutlich vom dilated CNN, nicht von der Phasen-Interferenz.
+# - Neues Flag --positional-alpha (in train_standard.py und train_qlayer.py):
+#   MixCoeffHead gibt pro Position statt einmal pro Sequenz ein
+#   Mischgewicht aus (B,223,L) statt (B,223) -- groesster erwarteter Hebel.
+# - Neues Skript train_cnn_only.py: Standard-Mixing direkt in denselben
+#   dilated CNN wie QLayer, aber OHNE Interferenz/Quadrieren dazwischen
+#   -- isoliert, ob der CNN allein fuer den QLayer-Vorsprung reicht.
+# - Neues Skript evaluate_new_models.py: wertet jedes der drei Modelle
+#   EINZELN aus (anders als export_results_data.py, das immer Standard+
+#   QLayer zusammen laedt) und schreibt getrennt nach results/new/<model>/.
+
+# Alle drei Modelle nacheinander trainieren, danach automatisch auswerten:
+
+nohup bash -c '
+export PIXI_CACHE_DIR="$HOME/.pixi-cache"
+cd /mnt/storage1/workspace/pgoldemund/parnet--idea1-reconstruction-head
+
+echo "=== [1/4] Training: Standard + positional alpha ==="
+pixi run -e parnet-dev-cu12 python scripts/train_standard.py --lambda-alpha 0.1 --lambda-nll 0.1 --positional-alpha --run-id globalclip.standard.positional_v1 --gpu 0
+
+echo "=== [2/4] Training: QLayer + positional alpha ==="
+pixi run -e parnet-dev-cu12 python scripts/train_qlayer.py --lambda-alpha 0.1 --lambda-nll 0.1 --positional-alpha --run-id globalclip.qlayer.positional_v1 --gpu 0
+
+echo "=== [3/4] Training: CNN-only Ablation ==="
+pixi run -e parnet-dev-cu12 python scripts/train_cnn_only.py --run-id ablation_cnn_only_v1 --gpu 0
+
+echo "=== [4/4] Auswertung aller drei Modelle -> results/new/ ==="
+pixi run -e parnet-dev-cu12 python scripts/evaluate_new_models.py \
+  --standard-run-id globalclip.standard.positional_v1 \
+  --qlayer-run-id globalclip.qlayer.positional_v1 \
+  --cnn-run-id ablation_cnn_only_v1 \
+  --output-dir results/new
+
+echo "=== ALLES FERTIG ==="
+' > logs/train_and_eval_all.log 2>&1 &
+
+
+## Fortschritt pruefen
+
+tail -n 50 logs/train_and_eval_all.log
+grep "===" logs/train_and_eval_all.log
+ps aux | grep train_
+
+
+## Ergebnis-Struktur nach dem Lauf
+
+# results/new/standard/summary.json + pearson_r_per_sequence.csv + pearson_distribution.png
+# results/new/qlayer/summary.json   + ...
+# results/new/cnn_only/summary.json + ...
+# results/new/00_combined_summary.csv   <- alle drei mean/median/std r nebeneinander
+
+
+## Nur die Auswertung erneut laufen lassen (falls Training schon fertig ist)
+
+pixi run -e parnet-dev-cu12 python scripts/evaluate_new_models.py \
+  --standard-run-id globalclip.standard.positional_v1 \
+  --qlayer-run-id globalclip.qlayer.positional_v1 \
+  --cnn-run-id ablation_cnn_only_v1 \
+  --output-dir results/new
+
+
+## Neue Parameter-Optionen
+
+# --positional-alpha   Mixing-Gewichte pro Position statt einmal pro Sequenz
+#                      (train_standard.py, train_qlayer.py, train_cnn_only.py)
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## Experiment: positionsabhaengige QLayer-Phase
+## ─────────────────────────────────────────────────────────────────────────
+
+# Ergebnis-Stand vor diesem Experiment:
+#   CNN-only + positional-alpha   r=0.4458  (bisher bestes Ergebnis)
+#   QLayer   + positional-alpha   r=0.4451  (Interferenz bringt keinen Vorteil)
+# Idee: die Phase phi_i ist bisher global (ein Wert pro Protein). Genau wie
+# bei alpha koennte Positionsabhaengigkeit helfen -> phi_i(p) statt phi_i,
+# per Conv1d aus dem Embedding berechnet (train_qlayer_positional_phase.py).
+
+nohup bash -c '
+export PIXI_CACHE_DIR="$HOME/.pixi-cache"
+cd /mnt/storage1/workspace/pgoldemund/parnet--idea1-reconstruction-head
+pixi run -e parnet-dev-cu12 python scripts/train_qlayer_positional_phase.py --positional-alpha --run-id globalclip.qlayer.positional_phase_v1 --gpu 0
+' > logs/train_qlayer_positional_phase.log 2>&1 &
+
+# Danach auswerten:
+pixi run -e parnet-dev-cu12 python scripts/evaluate_new_models.py \
+  --qlayer-run-id globalclip.qlayer.positional_phase_v1 \
+  --output-dir results/new_v3
+
+# Neue Parameter-Optionen:
+# --positional-phase wird von train_qlayer_positional_phase.py IMMER genutzt
+#                     (kein CLI-Flag noetig, ist der Zweck des Skripts)
+# --positional-alpha  kann zusaetzlich gesetzt werden (kombiniert beide Ideen)
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## Experiment: Hybrid-Modell "CombiLayer" (CNN-only-Pfad + QLayer-Pfad)
+## ─────────────────────────────────────────────────────────────────────────
+
+# Ergebnis-Stand vor diesem Experiment: keine QLayer-Variante (global/
+# positional Phase, mit/ohne Interferenz) hat CNN-only je geschlagen.
+# Idee: nicht mehr entscheiden muessen -- beide Signale (gewichtete Summe
+# UND Interferenzmuster) gleichzeitig an den CNN geben, er lernt selbst,
+# wie viel Gewicht er der Interferenz gibt. Kann nie schlechter als
+# CNN-only werden, Phasen bleiben trotzdem trainierbar/auslesbar.
+
+nohup bash -c '
+export PIXI_CACHE_DIR="$HOME/.pixi-cache"
+cd /mnt/storage1/workspace/pgoldemund/parnet--idea1-reconstruction-head
+pixi run -e parnet-dev-cu12 python scripts/train_combilayer.py --positional-alpha --run-id globalclip.combilayer.v1 --gpu 0
+' > logs/train_combilayer.log 2>&1 &
+
+# Danach auswerten -- gibt zusaetzlich Kanal-Ablation + Kopplungsmatrix aus:
+pixi run -e parnet-dev-cu12 python scripts/evaluate_new_models.py \
+  --combilayer-run-id globalclip.combilayer.v1 \
+  --output-dir results/new_v4
+
+# Ergebnis-Struktur (zusaetzlich zu summary.json etc.):
+#   results/new_v4/combilayer/channel_ablation.json
+#     -> mean_r_full, mean_r_interference_zeroed, mean_r_mixed_zeroed,
+#        interference_contribution (= wie viel r die Interferenz beitraegt)
+#   results/new_v4/combilayer/coupling_matrix.csv / .png / coupling_top_pairs.csv
+#     -> Protein-Protein-Interaktionsstruktur, unabhaengig davon ob der CNN
+#        sie fuer die Vorhersage nutzt
+
+# WICHTIG beim Interpretieren: falls channel_ablation.json zeigt, dass der
+# CNN den Interferenz-Kanal quasi komplett ignoriert (interference_weight_
+# fraction nahe 0), dann bekommt phi_i kaum noch Gradienten von der
+# Hauptvorhersage -> Kopplungsmatrix koennte dann wieder uninformativ sein,
+# diesmal aber nicht durch einen Bug, sondern weil das Netz selbst keine
+# nuetzliche Interaktion gefunden hat.

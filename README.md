@@ -114,6 +114,32 @@ on phase averaged over the given batch/positions (needs a batch of
 sequences passed in, since there's no single global phase to read off a
 trained parameter).
 
+### `GlobalCLIPHybridModel` ("CombiLayer")
+Feeds **both** the plain weighted-sum signal (`mixed`, same as
+`GlobalCLIPCNNModel`) and the QLayer interference pattern into the CNN as
+two separate input channels (`(B, 2, L)` instead of `(B, 1, L)`), instead of
+picking one architecture over the other. The CNN itself learns how much
+weight to give each channel.
+
+**Important caveat:** if the CNN learns to fully ignore the interference
+channel (weight → 0), the gradient path that would otherwise teach the
+phases φ_i to differentiate also disappears — only `λ_phase`
+regularization remains, which pulls phases back toward 0. In that case the
+coupling matrix could become uninformative again, this time because the
+network genuinely found no useful interaction signal (not a bug). Always
+check `channel_weight_summary()` / `channel_ablation.json` (written by
+`evaluate_new_models.py --combilayer-run-id ...`) to see whether this
+happened before interpreting the coupling matrix.
+
+`evaluate_new_models.py --combilayer-run-id <id>` additionally reports:
+- `channel_ablation.json`: test-set mean r with each channel zeroed out
+  (`mean_r_interference_zeroed`, `mean_r_mixed_zeroed`) and the resulting
+  `interference_contribution` (= accuracy drop from removing it) — the
+  most direct measure of how much the interference pathway matters.
+- `coupling_matrix.csv` / `.png` / `coupling_top_pairs.csv`: the
+  protein-protein interaction structure, independent of whether the CNN
+  uses it for prediction.
+
 ### `GlobalCLIPCNNModel` (ablation)
 Same as `GlobalCLIPStandardModel`'s mixing, but the weighted sum is fed
 directly into the same dilated CNN used by QLayer — **no** interference
@@ -130,6 +156,7 @@ ohne QLayer ... vs. mit QLayer").
 | `train_qlayer.py` | `GlobalCLIPQLayerModel` | same + `--lambda-phase`, `--cnn-*` |
 | `train_cnn_only.py` | `GlobalCLIPCNNModel` (ablation) | same as qlayer minus phase |
 | `train_qlayer_positional_phase.py` | `GlobalCLIPQLayerModel` with **positional phase** always on | `--positional-alpha` (combine with positional α too), `--lambda-phase`, `--cnn-*` |
+| `train_combilayer.py` | `GlobalCLIPHybridModel` ("CombiLayer": CNN-only path + QLayer path, both fed to CNN) | `--positional-alpha`, `--positional-phase`, `--lambda-phase`, `--cnn-*` |
 | `export_results_data.py` | Loads **one** Standard + **one** QLayer run together, full analysis: protein ranking, alpha correlation matrix, QLayer phase polar plot + coupling matrix, baselines, significance tests, Spearman, windowed correlation, Integrated Gradients. Writes ~15 CSVs + PNGs to a flat output dir. | `--standard-run-id`, `--qlayer-run-id`, `--output-dir` |
 | `evaluate_new_models.py` | Evaluates **any subset** of {standard, qlayer, cnn_only} runs **independently** (each gets its own subfolder) — lighter-weight than `export_results_data.py`, just test-set Pearson r + distribution plot per model, no protein-ranking/IG/etc. | `--standard-run-id`, `--qlayer-run-id`, `--cnn-run-id` (any combination), `--output-dir` |
 
@@ -168,6 +195,7 @@ afterward to get an actual held-out test-set number.
 | QLayer | global | interference + CNN | 0.407 | phase bug fixed; ≈ same as CNN-only *or slightly worse* |
 | QLayer | positional | interference + CNN | **0.4451** | best so far |
 | CNN-only (ablation) | positional | CNN only | **0.4458** | best overall — beats QLayer at both global and positional settings |
+| QLayer | positional | interference (positional phase) + CNN | 0.4325 | making phase positional as well made it *worse*, not better (−0.013 vs. global phase) — further evidence interference doesn't help here, regardless of how it's parameterized |
 
 **Key conclusions:**
 1. The global (one-per-sequence) mixing weight was the single biggest

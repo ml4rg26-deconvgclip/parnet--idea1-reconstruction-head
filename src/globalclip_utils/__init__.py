@@ -4,6 +4,7 @@ from .model import (
     GlobalCLIPStandardModel,
     GlobalCLIPQLayerModel,
     GlobalCLIPCNNModel,
+    GlobalCLIPHybridModel,
     MixCoeffHead,
     QLayer,
 )
@@ -32,6 +33,7 @@ __all__ = [
     "GlobalCLIPStandardModel",
     "GlobalCLIPQLayerModel",
     "GlobalCLIPCNNModel",
+    "GlobalCLIPHybridModel",
     "MixCoeffHead",
     "QLayer",
     "GlobalCLIPDataset",

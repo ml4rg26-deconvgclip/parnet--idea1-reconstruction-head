@@ -419,3 +419,134 @@ class GlobalCLIPCNNModel(nn.Module):
         pred = self.cnn(mixed)                                    # (B, 1, L)
         alpha_out = alpha if alpha.dim() == 2 else alpha.mean(dim=-1)
         return pred, alpha_out
+
+
+# ── Model 4: Hybrid CombiLayer (CNN-only path + QLayer path, both to CNN) ────
+
+
+class GlobalCLIPHybridModel(nn.Module):
+    """Hybrid "CombiLayer" model: feeds BOTH the plain weighted-sum signal
+    (as in GlobalCLIPCNNModel) AND the QLayer interference pattern into the
+    CNN as two separate input channels, instead of choosing one or the
+    other.
+
+    Motivation: across every prior comparison (global vs. positional alpha,
+    global vs. positional phase), the interference pathway never improved
+    on the plain CNN-only pathway, and sometimes made it slightly worse.
+    Rather than picking a winner, let the CNN itself learn how much (if
+    any) weight to give the interference channel -- so the model can never
+    do worse than CNN-only (the CNN can learn to ignore channel 2), while
+    the QLayer phase parameters still receive gradient and remain
+    interpretable via `get_coupling_matrix()`, regardless of how much the
+    CNN actually uses them for prediction.
+
+    Architecture:
+        PARNET backbone (frozen)
+            -> (B, 512, L) embedding  +  (B, 223, L) rbp_tracks
+        MixCoeffHead -> alpha, log_scale -> scaled tracks
+        mixed        = sum_i(scaled_i * alpha_i)              (B, 1, L)
+        interference = QLayer(scaled, alpha, embedding)       (B, 1, L)
+        cnn_input    = concat([mixed, interference], dim=1)   (B, 2, L)
+        Dilated CNN (2 input channels) -> (B, 1, L) prediction
+    """
+
+    def __init__(
+        self,
+        parnet_model: nn.Module,
+        num_rbps: int = 223,
+        mix_hidden: int = 128,
+        cnn_channels: int = 64,
+        cnn_kernel: int = 9,
+        cnn_layers: int = 3,
+        positional_alpha: bool = False,
+        positional_phase: bool = False,
+    ):
+        super().__init__()
+        self.backbone = parnet_model
+        for p in self.backbone.parameters():
+            p.requires_grad = False
+
+        self.mix_coeff = MixCoeffHead(
+            embed_dim=512, num_tasks=num_rbps, hidden=mix_hidden, positional=positional_alpha
+        )
+        self.log_scale = nn.Parameter(torch.zeros(num_rbps))
+        self.qlayer = QLayer(num_rbps=num_rbps, embed_dim=512, positional_phase=positional_phase)
+
+        layers: list[nn.Module] = []
+        in_ch = 2                                                  # mixed + interference
+        for i in range(cnn_layers):
+            dil = 2 ** i
+            pad = dil * (cnn_kernel // 2)
+            layers += [
+                nn.Conv1d(in_ch, cnn_channels, kernel_size=cnn_kernel, padding=pad, dilation=dil),
+                nn.ReLU(),
+            ]
+            in_ch = cnn_channels
+        layers.append(nn.Conv1d(cnn_channels, 1, kernel_size=1))
+        self.cnn = nn.Sequential(*layers)
+
+    def forward(
+        self, seq_onehot: torch.Tensor, ablate: str | None = None
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        """
+        Args:
+            seq_onehot: (B, 4, L) one-hot encoded sequence.
+            ablate: None (normal), "interference" (zero that channel), or
+                    "mixed" (zero that channel) -- for measuring how much
+                    each pathway actually contributes to predictions
+                    (channel-ablation analysis).
+
+        Returns:
+            pred:  (B, 1, L) predicted GlobalCLIP track.
+            alpha: (B, num_rbps) mixing coefficients.
+        """
+        with torch.no_grad():
+            embedding, rbp_tracks = _extract_parnet_features(self.backbone, seq_onehot)
+
+        alpha = self.mix_coeff(embedding)                         # (B, 223) or (B, 223, L)
+        scale = self.log_scale.exp()                              # (223,)
+        scaled = rbp_tracks * scale[None, :, None]                # (B, 223, L)
+        alpha_bc = alpha[:, :, None] if alpha.dim() == 2 else alpha
+
+        mixed = (scaled * alpha_bc).sum(1, keepdim=True)          # (B, 1, L)
+        interference = self.qlayer(scaled, alpha, embedding=embedding)  # (B, 1, L)
+
+        if ablate == "interference":
+            interference = torch.zeros_like(interference)
+        elif ablate == "mixed":
+            mixed = torch.zeros_like(mixed)
+
+        cnn_input = torch.cat([mixed, interference], dim=1)       # (B, 2, L)
+        pred = self.cnn(cnn_input)                                # (B, 1, L)
+        alpha_out = alpha if alpha.dim() == 2 else alpha.mean(dim=-1)
+        return pred, alpha_out
+
+    def get_coupling_matrix(self, seq_onehot: torch.Tensor | None = None) -> torch.Tensor:
+        """(num_rbps, num_rbps) pairwise coupling cos(φ_i − φ_j). See
+        GlobalCLIPQLayerModel.get_coupling_matrix for the positional_phase
+        case (requires `seq_onehot`)."""
+        if self.qlayer.positional_phase:
+            if seq_onehot is None:
+                raise ValueError("positional_phase=True requires `seq_onehot` to be passed.")
+            with torch.no_grad():
+                embedding, _ = _extract_parnet_features(self.backbone, seq_onehot)
+            return self.qlayer.coupling_matrix(embedding=embedding)
+        return self.qlayer.coupling_matrix()
+
+    def channel_weight_summary(self) -> dict:
+        """Quick, data-free proxy for how much the CNN attends to each
+        input channel: L2 norm of the first conv layer's weights per
+        channel. Not a substitute for the channel-ablation test in
+        evaluate_new_models.py (which measures actual accuracy impact),
+        but a cheap sanity check obtainable from the weights alone.
+        """
+        first_conv = self.cnn[0]
+        w = first_conv.weight.detach()             # (out_channels, 2, kernel_size)
+        mixed_norm = w[:, 0, :].norm().item()
+        interference_norm = w[:, 1, :].norm().item()
+        total = mixed_norm + interference_norm + 1e-8
+        return {
+            "mixed_weight_norm": mixed_norm,
+            "interference_weight_norm": interference_norm,
+            "interference_weight_fraction": interference_norm / total,
+        }

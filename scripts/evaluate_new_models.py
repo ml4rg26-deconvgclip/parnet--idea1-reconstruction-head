@@ -42,6 +42,7 @@ from globalclip_utils import (
     GlobalCLIPStandardModel,
     GlobalCLIPQLayerModel,
     GlobalCLIPCNNModel,
+    GlobalCLIPHybridModel,
     GlobalCLIPDataset,
     evaluate_pearson,
     load_run_config,
@@ -53,6 +54,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--standard-run-id", default=None, help="Run ID under results/globalclip/standard/")
     p.add_argument("--qlayer-run-id",   default=None, help="Run ID under results/globalclip/qlayer/")
     p.add_argument("--cnn-run-id",      default=None, help="Run ID under results/globalclip/cnn_only/")
+    p.add_argument("--combilayer-run-id", default=None, help="Run ID under results/globalclip/combilayer/")
     p.add_argument("--gpu",             type=int, default=0)
     p.add_argument("--batch-size",      type=int, default=128)
     p.add_argument("--num-workers",     type=int, default=4)
@@ -111,6 +113,24 @@ def _evaluate_and_save(name: str, model, test_loader, device, out_dir: Path) -> 
 
     print(f"[{name}] mean r = {mean_r:.4f}  median r = {summary['median_r']:.4f}  -> {out_dir}")
     return summary
+
+
+@torch.no_grad()
+def _evaluate_pearson_ablated(model, test_loader, device, ablate: str) -> float:
+    """Like evaluate_pearson, but zeroes one of GlobalCLIPHybridModel's two
+    input channels ("mixed" or "interference") to measure how much that
+    pathway actually contributes to prediction accuracy."""
+    model.eval()
+    corrs = []
+    for batch in test_loader:
+        seq, signal = batch["sequence"].to(device), batch["signal"].to(device)
+        pred, _ = model(seq, ablate=ablate)
+        target = torch.log1p(signal)
+        p, t = pred.squeeze(1), target.squeeze(1)
+        pz, tz = p - p.mean(-1, keepdim=True), t - t.mean(-1, keepdim=True)
+        r = (pz * tz).sum(-1) / (pz.norm(dim=-1) * tz.norm(dim=-1) + 1e-8)
+        corrs.extend(r.cpu().float().numpy().tolist())
+    return float(sum(corrs) / len(corrs))
 
 
 def main() -> None:
@@ -172,6 +192,66 @@ def main() -> None:
         )
         loader = _test_loader(cfg["dataset_path"], args.batch_size, args.num_workers)
         summaries.append(_evaluate_and_save("cnn_only", model, loader, device, out_root / "cnn_only"))
+
+    if args.combilayer_run_id:
+        run_dir = PROJECT_DIR / "results" / "globalclip" / "combilayer" / args.combilayer_run_id
+        model, cfg = _load_model(
+            GlobalCLIPHybridModel, run_dir, parnet, device,
+            lambda cfg: dict(
+                num_rbps=cfg["params_num_rbps"],
+                mix_hidden=cfg["params_mix_hidden"],
+                cnn_channels=cfg["params_cnn_channels"],
+                cnn_kernel=cfg["params_cnn_kernel"],
+                cnn_layers=cfg["params_cnn_layers"],
+                positional_alpha=cfg.get("params_positional_alpha", False),
+                positional_phase=cfg.get("params_positional_phase", False),
+            ),
+        )
+        loader = _test_loader(cfg["dataset_path"], args.batch_size, args.num_workers)
+        summary = _evaluate_and_save("combilayer", model, loader, device, out_root / "combilayer")
+
+        # How much does each channel actually contribute to accuracy?
+        r_no_interference = _evaluate_pearson_ablated(model, loader, device, ablate="interference")
+        r_no_mixed         = _evaluate_pearson_ablated(model, loader, device, ablate="mixed")
+        channel_weights = model.channel_weight_summary()
+        ablation = {
+            "mean_r_full":               summary["mean_r"],
+            "mean_r_interference_zeroed": r_no_interference,
+            "mean_r_mixed_zeroed":        r_no_mixed,
+            "interference_contribution": summary["mean_r"] - r_no_interference,
+            **channel_weights,
+        }
+        (out_root / "combilayer" / "channel_ablation.json").write_text(json.dumps(ablation, indent=2))
+        print(f"[combilayer] channel ablation: {ablation}")
+        summaries.append(summary)
+
+        # Protein-protein coupling matrix (how the proteins interact via phase)
+        rbp_names_path = PROJECT_DIR / "results" / "globalclip" / "datasets" / "rbp_names.txt"
+        if rbp_names_path.exists():
+            rbp_names = rbp_names_path.read_text().strip().split("\n")
+            sample_batch = next(iter(loader))["sequence"].to(device)
+            coupling = model.get_coupling_matrix(seq_onehot=sample_batch).cpu().numpy()
+            pd.DataFrame(coupling, index=rbp_names, columns=rbp_names).reset_index(names="protein") \
+                .to_csv(out_root / "combilayer" / "coupling_matrix.csv", index=False)
+
+            idx = np.triu_indices(len(rbp_names), k=1)
+            pairs = sorted(
+                [(coupling[i, j], rbp_names[i], rbp_names[j]) for i, j in zip(idx[0], idx[1])],
+                key=lambda x: x[0],
+            )
+            pd.DataFrame(pairs[:25] + pairs[-25:], columns=["cos_delta_phi", "protein_a", "protein_b"]) \
+                .to_csv(out_root / "combilayer" / "coupling_top_pairs.csv", index=False)
+
+            fig, ax = plt.subplots(figsize=(6, 5))
+            im = ax.imshow(coupling, cmap="RdBu_r", vmin=-1, vmax=1, aspect="auto")
+            plt.colorbar(im, ax=ax, label="cos(phi_i - phi_j)")
+            ax.set_title("CombiLayer coupling matrix")
+            plt.tight_layout()
+            fig.savefig(out_root / "combilayer" / "coupling_matrix.png", dpi=120, bbox_inches="tight")
+            plt.close(fig)
+            print(f"[combilayer] coupling matrix saved -> {out_root / 'combilayer'}")
+        else:
+            print(f"[combilayer] WARNING: {rbp_names_path} not found, skipping coupling matrix export.")
 
     if not summaries:
         print("No --*-run-id given, nothing to evaluate.")
