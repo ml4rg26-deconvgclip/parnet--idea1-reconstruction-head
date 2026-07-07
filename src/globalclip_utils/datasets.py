@@ -111,6 +111,17 @@ class GlobalCLIPDataset(torch.utils.data.Dataset):
         signal = torch_sparse_to_dense(elem["outputs"][self.total_key]).float().clone()    # (1, L)
         # control = torch_sparse_to_dense(elem["outputs"]["control"]).float()             # (1, L) — not used
 
+        if signal.shape[-1] != self.seq_len:
+            # Some (rare) windows near chromosome/contig boundaries have a
+            # shorter recorded signal length than seq_len. Pad/crop to a
+            # fixed length so DataLoader batching never sees mismatched
+            # tensor sizes, regardless of which samples end up in the same
+            # batch (e.g. after outlier filtering changes batch composition).
+            fixed = torch.zeros(signal.shape[0], self.seq_len, dtype=signal.dtype)
+            n = min(signal.shape[-1], self.seq_len)
+            fixed[:, :n] = signal[:, :n]
+            signal = fixed
+
         return {
             "sequence": seq_onehot,   # (4, L)
             "signal": signal,         # (1, L)
