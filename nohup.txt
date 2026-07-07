@@ -199,3 +199,92 @@ pixi run -e parnet-dev-cu12 python scripts/evaluate_new_models.py \
 # Hauptvorhersage -> Kopplungsmatrix koennte dann wieder uninformativ sein,
 # diesmal aber nicht durch einen Bug, sondern weil das Netz selbst keine
 # nuetzliche Interaktion gefunden hat.
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## Fairer Vergleich Idea 1 vs. Idea 2: Ausreisser-gefiltertes Dataset
+## ─────────────────────────────────────────────────────────────────────────
+
+# Kontext: Idea 2 (Lukas) filtert Trainingsfenster mit Gesamtsignal > 1000
+# heraus (~357 von 39.052, ~0.9%), da diese Ausreisser das Training destabil-
+# isiert haben. Fuer einen fairen Vergleich beider Ideen auf demselben
+# Datensatz trainieren/evaluieren wir unser bestes Idea-1-Modell (CNN-only +
+# positional-alpha) mit demselben Filter neu.
+# --max-total-signal Flag in datasets.py/train_cnn_only.py/
+# evaluate_new_models.py implementiert -- wendet exakt dieselbe Regel an
+# (Fenster mit Gesamtsignal > Schwelle werden komplett ausgeschlossen).
+
+nohup bash -c '
+export PIXI_CACHE_DIR="$HOME/.pixi-cache"
+cd /mnt/storage1/workspace/pgoldemund/parnet--idea1-reconstruction-head
+pixi run -e parnet-dev-cu12 python scripts/train_cnn_only.py --positional-alpha --max-total-signal 1000 --run-id ablation_cnn_only_positional_filtered_v1 --gpu 0
+' > logs/train_cnn_only_filtered.log 2>&1 &
+
+# Danach auswerten (Test-Set wird automatisch mit demselben Filter geladen,
+# da run_config.json den Wert speichert und evaluate_new_models.py ihn
+# wieder ausliest):
+pixi run -e parnet-dev-cu12 python scripts/evaluate_new_models.py \
+  --cnn-run-id ablation_cnn_only_positional_filtered_v1 \
+  --output-dir results/new_v5
+
+# Vergleich dann: results/new_v5/cnn_only/summary.json (Idea 1, gefiltert)
+# gegen Idea 2's bestes Ergebnis (Pearson 0.266, Unfreeze-5, filtered).
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## ALLE Modellvarianten auf dem gefilterten Datensatz (aus Interesse)
+## ─────────────────────────────────────────────────────────────────────────
+
+# --max-total-signal jetzt in ALLEN Trainingsskripten verfuegbar
+# (train_standard.py, train_qlayer.py, train_qlayer_positional_phase.py,
+#  train_cnn_only.py, train_combilayer.py). Alle 8 bisherigen Varianten
+# hier nochmal auf dem gefilterten Datensatz (Cap bei 1000).
+# Achtung: 8 volle 50-Epochen-Trainings hintereinander -- das dauert lange.
+
+nohup bash -c '
+export PIXI_CACHE_DIR="$HOME/.pixi-cache"
+cd /mnt/storage1/workspace/pgoldemund/parnet--idea1-reconstruction-head
+
+echo "=== [1/8] Standard, global alpha, filtered ==="
+pixi run -e parnet-dev-cu12 python scripts/train_standard.py --lambda-alpha 0.1 --lambda-nll 0.1 --max-total-signal 1000 --run-id globalclip.standard.filtered_v1 --gpu 0
+
+echo "=== [2/8] Standard, positional alpha, filtered ==="
+pixi run -e parnet-dev-cu12 python scripts/train_standard.py --lambda-alpha 0.1 --lambda-nll 0.1 --positional-alpha --max-total-signal 1000 --run-id globalclip.standard.positional_filtered_v1 --gpu 0
+
+echo "=== [3/8] QLayer, global alpha, filtered ==="
+pixi run -e parnet-dev-cu12 python scripts/train_qlayer.py --lambda-alpha 0.1 --lambda-nll 0.1 --max-total-signal 1000 --run-id globalclip.qlayer.filtered_v1 --gpu 0
+
+echo "=== [4/8] QLayer, positional alpha, filtered ==="
+pixi run -e parnet-dev-cu12 python scripts/train_qlayer.py --lambda-alpha 0.1 --lambda-nll 0.1 --positional-alpha --max-total-signal 1000 --run-id globalclip.qlayer.positional_filtered_v1 --gpu 0
+
+echo "=== [5/8] QLayer, positional phase, filtered ==="
+pixi run -e parnet-dev-cu12 python scripts/train_qlayer_positional_phase.py --positional-alpha --max-total-signal 1000 --run-id globalclip.qlayer.positional_phase_filtered_v1 --gpu 0
+
+echo "=== [6/8] CNN-only, global alpha, filtered ==="
+pixi run -e parnet-dev-cu12 python scripts/train_cnn_only.py --max-total-signal 1000 --run-id ablation_cnn_only_filtered_v1 --gpu 0
+
+echo "=== [7/8] CNN-only, positional alpha, filtered ==="
+pixi run -e parnet-dev-cu12 python scripts/train_cnn_only.py --positional-alpha --max-total-signal 1000 --run-id ablation_cnn_only_positional_filtered_v1 --gpu 0
+
+echo "=== [8/8] CombiLayer (hybrid), positional alpha, filtered ==="
+pixi run -e parnet-dev-cu12 python scripts/train_combilayer.py --positional-alpha --max-total-signal 1000 --run-id globalclip.combilayer.filtered_v1 --gpu 0
+
+echo "=== ALLE TRAININGS FERTIG ==="
+' > logs/train_all_filtered.log 2>&1 &
+
+
+## Danach alle auswerten (jede Variante eigener Output-Ordner, da
+## evaluate_new_models.py pro Modelltyp nur einen Run gleichzeitig schreibt):
+
+pixi run -e parnet-dev-cu12 python scripts/evaluate_new_models.py --standard-run-id globalclip.standard.filtered_v1 --output-dir results/new_filtered_standard_global
+pixi run -e parnet-dev-cu12 python scripts/evaluate_new_models.py --standard-run-id globalclip.standard.positional_filtered_v1 --output-dir results/new_filtered_standard_positional
+pixi run -e parnet-dev-cu12 python scripts/evaluate_new_models.py --qlayer-run-id globalclip.qlayer.filtered_v1 --output-dir results/new_filtered_qlayer_global
+pixi run -e parnet-dev-cu12 python scripts/evaluate_new_models.py --qlayer-run-id globalclip.qlayer.positional_filtered_v1 --output-dir results/new_filtered_qlayer_positional
+pixi run -e parnet-dev-cu12 python scripts/evaluate_new_models.py --qlayer-run-id globalclip.qlayer.positional_phase_filtered_v1 --output-dir results/new_filtered_qlayer_posphase
+pixi run -e parnet-dev-cu12 python scripts/evaluate_new_models.py --cnn-run-id ablation_cnn_only_filtered_v1 --output-dir results/new_filtered_cnn_global
+pixi run -e parnet-dev-cu12 python scripts/evaluate_new_models.py --cnn-run-id ablation_cnn_only_positional_filtered_v1 --output-dir results/new_filtered_cnn_positional
+pixi run -e parnet-dev-cu12 python scripts/evaluate_new_models.py --combilayer-run-id globalclip.combilayer.filtered_v1 --output-dir results/new_filtered_combilayer
+
+# Fortschritt pruefen:
+#   grep "===" logs/train_all_filtered.log
+#   ps aux | grep train_

@@ -65,6 +65,9 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--positional-alpha", action="store_true",
                     help="Predict per-position mixing weights (B,223,L) instead of "
                          "one global weight vector per sequence (B,223).")
+    p.add_argument("--max-total-signal", type=float, default=None,
+                    help="Drop windows with total signal above this value (e.g. 1000), "
+                         "matching Idea 2's outlier-filtered dataset for a fair comparison.")
     return p.parse_args()
 
 
@@ -100,9 +103,11 @@ def main() -> None:
 
     # ── Data ──────────────────────────────────────────────────────────────────
     train_ds = GlobalCLIPDataset(fp.dataset, split="train",
-                                 seq_len=args.seq_len, total_key="globalCLIP")
+                                 seq_len=args.seq_len, total_key="globalCLIP",
+                                 max_total_signal=args.max_total_signal)
     val_ds   = GlobalCLIPDataset(fp.dataset, split="valid",
-                                 seq_len=args.seq_len, total_key="globalCLIP")
+                                 seq_len=args.seq_len, total_key="globalCLIP",
+                                 max_total_signal=args.max_total_signal)
 
     train_loader = torch.utils.data.DataLoader(
         train_ds, batch_size=args.batch_size, shuffle=True,
@@ -190,6 +195,7 @@ def main() -> None:
         "params_cnn_kernel":     args.cnn_kernel,
         "params_cnn_layers":     args.cnn_layers,
         "params_positional_alpha": args.positional_alpha,
+        "params_max_total_signal": args.max_total_signal,
         "params_lr":             args.lr,
         "params_max_epochs":     args.max_epochs,
         "params_lambda_nll":     args.lambda_nll,

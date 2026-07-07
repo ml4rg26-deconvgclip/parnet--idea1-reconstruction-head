@@ -76,8 +76,9 @@ def _load_model(model_cls, run_dir: Path, parnet, device, kwargs_from_cfg):
     return model, cfg
 
 
-def _test_loader(dataset_path: str, batch_size: int, num_workers: int):
-    ds = GlobalCLIPDataset(Path(dataset_path), split="test", seq_len=600, total_key="globalCLIP")
+def _test_loader(dataset_path: str, batch_size: int, num_workers: int, max_total_signal: float | None = None):
+    ds = GlobalCLIPDataset(Path(dataset_path), split="test", seq_len=600, total_key="globalCLIP",
+                           max_total_signal=max_total_signal)
     return torch.utils.data.DataLoader(
         ds, batch_size=batch_size, shuffle=False,
         num_workers=num_workers, pin_memory=torch.cuda.is_available(),
@@ -157,7 +158,8 @@ def main() -> None:
                 positional_alpha=cfg.get("params_positional_alpha", False),
             ),
         )
-        loader = _test_loader(cfg["dataset_path"], args.batch_size, args.num_workers)
+        loader = _test_loader(cfg["dataset_path"], args.batch_size, args.num_workers,
+                               max_total_signal=cfg.get("params_max_total_signal"))
         summaries.append(_evaluate_and_save("standard", model, loader, device, out_root / "standard"))
 
     if args.qlayer_run_id:
@@ -174,7 +176,8 @@ def main() -> None:
                 positional_phase=cfg.get("params_positional_phase", False),
             ),
         )
-        loader = _test_loader(cfg["dataset_path"], args.batch_size, args.num_workers)
+        loader = _test_loader(cfg["dataset_path"], args.batch_size, args.num_workers,
+                               max_total_signal=cfg.get("params_max_total_signal"))
         summaries.append(_evaluate_and_save("qlayer", model, loader, device, out_root / "qlayer"))
 
     if args.cnn_run_id:
@@ -190,7 +193,8 @@ def main() -> None:
                 positional_alpha=cfg.get("params_positional_alpha", False),
             ),
         )
-        loader = _test_loader(cfg["dataset_path"], args.batch_size, args.num_workers)
+        loader = _test_loader(cfg["dataset_path"], args.batch_size, args.num_workers,
+                               max_total_signal=cfg.get("params_max_total_signal"))
         summaries.append(_evaluate_and_save("cnn_only", model, loader, device, out_root / "cnn_only"))
 
     if args.combilayer_run_id:
@@ -207,7 +211,8 @@ def main() -> None:
                 positional_phase=cfg.get("params_positional_phase", False),
             ),
         )
-        loader = _test_loader(cfg["dataset_path"], args.batch_size, args.num_workers)
+        loader = _test_loader(cfg["dataset_path"], args.batch_size, args.num_workers,
+                               max_total_signal=cfg.get("params_max_total_signal"))
         summary = _evaluate_and_save("combilayer", model, loader, device, out_root / "combilayer")
 
         # How much does each channel actually contribute to accuracy?

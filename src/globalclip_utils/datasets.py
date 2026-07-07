@@ -47,10 +47,16 @@ class GlobalCLIPDataset(torch.utils.data.Dataset):
     dicts with float tensors ready for the GlobalCLIP models.
 
     Args:
-        pt_path:   Path to the .pt or .pt.gz data file.
-        split:     Dataset split: "train", "valid", or "test".
-        seq_len:   Sequence length to use (default 600).
-        total_key: Key for the target signal in elem["outputs"] (default "globalCLIP").
+        pt_path:          Path to the .pt or .pt.gz data file.
+        split:            Dataset split: "train", "valid", or "test".
+        seq_len:           Sequence length to use (default 600).
+        total_key:         Key for the target signal in elem["outputs"] (default "globalCLIP").
+        max_total_signal: If set, drop windows whose total signal (summed
+                          over the whole 600nt window) exceeds this value.
+                          Matches the outlier-capping preprocessing used for
+                          the "filtered" dataset comparison in Idea 2 (cap of
+                          1000, implemented by Lukas) -- used here so Idea 1
+                          and Idea 2 can be compared on the identical dataset.
     """
 
     def __init__(
@@ -59,6 +65,7 @@ class GlobalCLIPDataset(torch.utils.data.Dataset):
         split: str,
         seq_len: int = 600,
         total_key: str = "globalCLIP",
+        max_total_signal: float | None = None,
     ):
         pt_path = Path(pt_path)
         if not pt_path.exists():
@@ -82,6 +89,18 @@ class GlobalCLIPDataset(torch.utils.data.Dataset):
         self.total_key = total_key
         print(f"loaded {len(self.samples)} samples.")
 
+        if max_total_signal is not None:
+            n_before = len(self.samples)
+            self.samples = [
+                elem for elem in self.samples
+                if float(elem["outputs"][total_key]["values"].sum()) <= max_total_signal
+            ]
+            n_removed = n_before - len(self.samples)
+            print(
+                f"Filtered {n_removed} of {n_before} '{split}' windows with "
+                f"total signal > {max_total_signal} ({len(self.samples)} remaining)."
+            )
+
     def __len__(self) -> int:
         return len(self.samples)
 
@@ -89,16 +108,8 @@ class GlobalCLIPDataset(torch.utils.data.Dataset):
         elem = self.samples[idx]
 
         seq_onehot = _seq_to_onehot(elem["inputs"]["sequence"], self.seq_len)
-        signal = torch_sparse_to_dense(elem["outputs"][self.total_key]).float()    # (1, L_orig)
-        # Ensure signal length matches seq_len (pad or truncate)
-        L = signal.shape[-1]
-        if L > self.seq_len:
-            signal = signal[..., :self.seq_len]
-        elif L < self.seq_len:
-            import torch.nn.functional as F
-            signal = F.pad(signal, (0, self.seq_len - L))
-        signal = signal.clone()
-        # control = torch_sparse_to_dense(elem["outputs"]["control"]).float()      # (1, L) — not used
+        signal = torch_sparse_to_dense(elem["outputs"][self.total_key]).float().clone()    # (1, L)
+        # control = torch_sparse_to_dense(elem["outputs"]["control"]).float()             # (1, L) — not used
 
         return {
             "sequence": seq_onehot,   # (4, L)
