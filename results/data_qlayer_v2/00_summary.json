@@ -1,0 +1,25 @@
+{
+  "baseline": {
+    "mean_r": 0.18915854764426418,
+    "median_r": 0.1787826269865036,
+    "std_r": 0.08801879674737739
+  },
+  "mean_train_profile": {
+    "mean_r": 0.009982371962084147
+  },
+  "standard": {
+    "mean_r": 0.2656454988927343,
+    "median_r": 0.25479280948638916,
+    "std_r": 0.11102253480468718
+  },
+  "qlayer": {
+    "mean_r": 0.4073189824313608,
+    "median_r": 0.4053242653608322,
+    "std_r": 0.1598574170257816
+  },
+  "significance_wilcoxon_p": {
+    "standard_vs_baseline": 0.0,
+    "qlayer_vs_baseline": 0.0,
+    "qlayer_vs_standard": 0.0
+  }
+}

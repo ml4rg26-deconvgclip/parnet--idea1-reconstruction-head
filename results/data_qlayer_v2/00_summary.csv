@@ -1,0 +1,5 @@
+model,trainable_params,mean_pearson_r,median_pearson_r,mean_spearman_rho
+baseline (naive mean of raw tracks),0,0.18915854764426418,0.1787826269865036,0.07436091127797927
+mean_train_profile (no sequence),0,0.009982371962084147,,
+standard (MixCoeffHead + log_scale),94654,0.2656454988927343,0.25479280948638916,0.10649033680667323
+qlayer (QLayer + dilated CNN),169438,0.4073189824313608,0.4053242653608322,0.10623135408507886
