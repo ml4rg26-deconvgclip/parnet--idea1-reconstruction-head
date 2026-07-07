@@ -288,3 +288,46 @@ pixi run -e parnet-dev-cu12 python scripts/evaluate_new_models.py --combilayer-r
 # Fortschritt pruefen:
 #   grep "===" logs/train_all_filtered.log
 #   ps aux | grep train_
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## Motiv-Validierung (IG + metamotif) fuer Idea-1-Protein-Ranking
+## ─────────────────────────────────────────────────────────────────────────
+
+# Unabhaengige Validierung: stimmen die von unserem Combi-Layer als wichtig
+# eingestuften Proteine (PABPN1, HNRNPC, SND1 / DGCR8, NONO, LSM11) mit
+# literaturbekannten Bindemotiven ueberein? IG direkt auf PARNETs eigenem
+# Protein-Track (nicht auf unserer finalen Vorhersage), dann dieselbe
+# metamotif+RBP-Datenbank-Pipeline wie bei Idea 2 (von Lukas geteilt,
+# siehe 03_integrated_gradients.ipynb).
+#
+# WICHTIG: erst starten, NACHDEM der grosse 8-Modell-Filtered-Batch oben
+# fertig ist (GPU-Konflikt sonst) -- daher als eigener nohup-Block, der
+# man manuell NACH dem Training startet (nicht automatisch verkettet).
+
+# Liste deckt ab: Standard-Top3, alle 6 QLayer-Top, CombiLayer-spezifische,
+# UND die von Idea 2 (Lukas) gefundenen Top-RBPs, die auch in unseren 223
+# PARNET-Tracks vorkommen (PTBP1, KHSRP -- die anderen von Idea 2 gefundenen
+# wie NFKB1/RPO21/TLR3/SXL/CTHT_0057680/YBX1/SRSF5 sind NICHT Teil unserer
+# 223 Tracks, koennen also nicht getestet werden).
+
+nohup bash -c '
+export PIXI_CACHE_DIR="$HOME/.pixi-cache"
+cd /mnt/storage1/workspace/pgoldemund/parnet--idea1-reconstruction-head
+pixi run -e parnet-dev-cu12 python scripts/motif_validation.py \
+  --proteins PTBP1_HepG2 KHSRP_K562 \
+             PABPN1_HepG2 HNRNPC_K562 HNRNPC_HepG2 SND1_HepG2 \
+             DGCR8_K562 NONO_K562 LSM11_K562 ILF3_K562 EXOSC5_HepG2 HNRNPU_HepG2 \
+             DDX3X_K562 UPF1_HepG2 YBX3_K562 \
+  --output-dir results/motif_validation --gpu 0
+' > logs/motif_validation.log 2>&1 &
+
+# Fortschritt pruefen:
+#   tail -f logs/motif_validation.log
+#   grep "===\|Self-match" logs/motif_validation.log
+#
+# Ergebnis: results/motif_validation/<protein>/metamotif/rbp_matches.json
+#           results/motif_validation/00_summary.json (self_match pro Protein)
+#
+# Dauer: ~20-25 Min pro Protein (analog zu Lukas' Notebook bei 4.9k Sequenzen)
+# -> bei 15 Proteinen realistisch 5-6 Stunden, gut geeignet als Ueber-Nacht-Lauf.
