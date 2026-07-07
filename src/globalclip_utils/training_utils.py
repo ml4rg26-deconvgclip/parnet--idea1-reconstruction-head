@@ -123,7 +123,15 @@ class GlobalCLIPLightningModule(pl.LightningModule):
         total = loss_p + self.lambda_nll * loss_n + self.lambda_alpha * loss_a
 
         if hasattr(self.model, "qlayer"):
-            phase_reg = (self.model.qlayer.phase ** 2).mean()
+            if self.model.qlayer.positional_phase:
+                # No single `phase` tensor to regularize directly (phase is
+                # computed per-batch from the embedding via phase_net). Proxy:
+                # L2 on phase_net's own weights, which keeps its output near
+                # phase_net's bias (i.e. near a constant/global phase) unless
+                # the data actually needs positional variation.
+                phase_reg = sum((p ** 2).mean() for p in self.model.qlayer.phase_net.parameters())
+            else:
+                phase_reg = (self.model.qlayer.phase ** 2).mean()
             total = total + self.lambda_phase * phase_reg
             self.log(f"{prefix}/phase_reg", phase_reg)
 
