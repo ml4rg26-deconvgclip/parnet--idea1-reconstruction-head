@@ -85,21 +85,40 @@ class QLayer(nn.Module):
         background noise will be pushed toward opposing phases.
     """
 
-    def __init__(self, num_rbps: int = 223):
+    def __init__(self, num_rbps: int = 223, embed_dim: int = 512, positional_phase: bool = False):
         super().__init__()
-        # NOTE: must NOT init all phases to exactly 0 — at phi=0 for every
-        # protein, imag = sum(amp_i * sin(0)) = 0 identically, which makes
-        # dI/dphi_j = 2*real*(-amp_j*sin(0)) + 2*imag*(amp_j*cos(0)) = 0 for
-        # every j regardless of the data. That's an exact saddle point, so
-        # phase never moves away from 0 during training. Small random init
-        # breaks the symmetry so gradients can flow from step 0.
-        self.phase = nn.Parameter(torch.randn(num_rbps) * 0.1)
+        self.positional_phase = positional_phase
+        if positional_phase:
+            # Phase becomes a function of local sequence context instead of a
+            # single global value per protein: phi(p) = conv1x1(embedding)(p).
+            # Cooperativity/competition between two proteins can then depend
+            # on e.g. local secondary structure, not just protein identity.
+            self.phase_net = nn.Conv1d(embed_dim, num_rbps, kernel_size=1)
+        else:
+            # NOTE: must NOT init all phases to exactly 0 — at phi=0 for every
+            # protein, imag = sum(amp_i * sin(0)) = 0 identically, which makes
+            # dI/dphi_j = 2*real*(-amp_j*sin(0)) + 2*imag*(amp_j*cos(0)) = 0 for
+            # every j regardless of the data. That's an exact saddle point, so
+            # phase never moves away from 0 during training. Small random init
+            # breaks the symmetry so gradients can flow from step 0.
+            self.phase = nn.Parameter(torch.randn(num_rbps) * 0.1)
 
-    def forward(self, rbp_tracks: torch.Tensor, alpha: torch.Tensor) -> torch.Tensor:
+    def _phase(self, embedding: torch.Tensor | None) -> torch.Tensor:
+        if self.positional_phase:
+            if embedding is None:
+                raise ValueError("positional_phase=True requires `embedding` to be passed.")
+            return self.phase_net(embedding)                        # (B, R, L)
+        return self.phase                                           # (R,)
+
+    def forward(
+        self, rbp_tracks: torch.Tensor, alpha: torch.Tensor, embedding: torch.Tensor | None = None
+    ) -> torch.Tensor:
         """
         Args:
             rbp_tracks: (B, num_rbps, L) scaled RBP binding tracks.
-            alpha:      (B, num_rbps) mixing coefficients.
+            alpha:      (B, num_rbps) or (B, num_rbps, L) mixing coefficients.
+            embedding:  (B, embed_dim, L) backbone embedding. Required iff
+                        positional_phase=True.
 
         Returns:
             interference: (B, 1, L) |Ψ|² interference pattern.
@@ -107,18 +126,30 @@ class QLayer(nn.Module):
         if alpha.dim() == 2:
             alpha = alpha[:, :, None]                               # (B, R) -> (B, R, 1)
         amp = rbp_tracks * alpha                                    # (B, R, L)
-        phi = self.phase                                            # (R,)
-        real = (amp * torch.cos(phi)[None, :, None]).sum(1)        # (B, L)
-        imag = (amp * torch.sin(phi)[None, :, None]).sum(1)        # (B, L)
+        phi = self._phase(embedding)
+        if phi.dim() == 1:
+            phi = phi[None, :, None]                                # (R,) -> (1, R, 1), broadcasts
+        real = (amp * torch.cos(phi)).sum(1)                        # (B, L)
+        imag = (amp * torch.sin(phi)).sum(1)                        # (B, L)
         return (real ** 2 + imag ** 2).unsqueeze(1)                # (B, 1, L)
 
-    def coupling_matrix(self) -> torch.Tensor:
+    def coupling_matrix(self, embedding: torch.Tensor | None = None) -> torch.Tensor:
         """Return (num_rbps, num_rbps) pairwise coupling: cos(φ_i − φ_j).
 
         Values > 0 mean the two proteins tend to cooperate (constructive);
         values < 0 mean they compete or anti-correlate (destructive).
+
+        If positional_phase=True, `embedding` (a batch of backbone
+        embeddings) must be supplied; the returned matrix is then based on
+        the phase averaged over batch and position (a single summary
+        matrix, not a per-position one).
         """
-        phi = self.phase.detach()
+        if self.positional_phase:
+            if embedding is None:
+                raise ValueError("positional_phase=True requires `embedding` to be passed.")
+            phi = self.phase_net(embedding).detach().mean(dim=(0, 2))  # (R,)
+        else:
+            phi = self.phase.detach()
         return torch.cos(phi[:, None] - phi[None, :])
 
 
@@ -258,6 +289,7 @@ class GlobalCLIPQLayerModel(nn.Module):
         cnn_kernel: int = 9,
         cnn_layers: int = 3,
         positional_alpha: bool = False,
+        positional_phase: bool = False,
     ):
         super().__init__()
         self.backbone = parnet_model
@@ -268,7 +300,7 @@ class GlobalCLIPQLayerModel(nn.Module):
             embed_dim=512, num_tasks=num_rbps, hidden=mix_hidden, positional=positional_alpha
         )
         self.log_scale = nn.Parameter(torch.zeros(num_rbps))
-        self.qlayer = QLayer(num_rbps=num_rbps)
+        self.qlayer = QLayer(num_rbps=num_rbps, embed_dim=512, positional_phase=positional_phase)
 
         # Dilated CNN to refine the local context after interference
         layers: list[nn.Module] = []
@@ -302,13 +334,25 @@ class GlobalCLIPQLayerModel(nn.Module):
         scale = self.log_scale.exp()                              # (223,)
         scaled = rbp_tracks * scale[None, :, None]                # (B, 223, L)
 
-        interference = self.qlayer(scaled, alpha)                 # (B, 1, L)
+        interference = self.qlayer(scaled, alpha, embedding=embedding)  # (B, 1, L)
         pred = self.cnn(interference)                             # (B, 1, L)
         alpha_out = alpha if alpha.dim() == 2 else alpha.mean(dim=-1)
         return pred, alpha_out
 
-    def get_coupling_matrix(self) -> torch.Tensor:
-        """(num_rbps, num_rbps) pairwise coupling cos(φ_i − φ_j)."""
+    def get_coupling_matrix(self, seq_onehot: torch.Tensor | None = None) -> torch.Tensor:
+        """(num_rbps, num_rbps) pairwise coupling cos(φ_i − φ_j).
+
+        If the QLayer uses positional_phase, `seq_onehot` (a batch of
+        sequences, e.g. from the test set) must be supplied so the
+        embedding needed to compute phase(p) can be derived; the returned
+        matrix is then the phase averaged over that batch and position.
+        """
+        if self.qlayer.positional_phase:
+            if seq_onehot is None:
+                raise ValueError("positional_phase=True requires `seq_onehot` to be passed.")
+            with torch.no_grad():
+                embedding, _ = _extract_parnet_features(self.backbone, seq_onehot)
+            return self.qlayer.coupling_matrix(embedding=embedding)
         return self.qlayer.coupling_matrix()
 
 

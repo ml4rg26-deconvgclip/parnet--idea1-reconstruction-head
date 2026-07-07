@@ -1,0 +1,16 @@
+{
+  "model_type": "GlobalCLIPStandardModel",
+  "pretrained_model_name": "parnet.7m-0.0",
+  "control_dataset": "globalclip_lysate_noNHS",
+  "params_seq_length": 600,
+  "params_batch_size": 64,
+  "params_num_rbps": 223,
+  "params_mix_hidden": 128,
+  "params_positional_alpha": true,
+  "params_lr": 0.0003,
+  "params_max_epochs": 50,
+  "params_lambda_nll": 0.1,
+  "params_lambda_alpha": 0.1,
+  "dataset_path": "/mnt/storage1/ml4rg26-deconvgclip/provided_data/600nt_globalCLIP_synchronized_datasets/globalclip_lysate_noNHS_600bp_signalfiltered.pt.gz",
+  "output_dir": "/mnt/storage1/workspace/pgoldemund/parnet--idea1-reconstruction-head/results/globalclip/standard/globalclip.standard.positional_v1"
+}

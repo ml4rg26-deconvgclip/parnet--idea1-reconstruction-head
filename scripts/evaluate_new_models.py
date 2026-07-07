@@ -151,6 +151,7 @@ def main() -> None:
                 cnn_kernel=cfg["params_cnn_kernel"],
                 cnn_layers=cfg["params_cnn_layers"],
                 positional_alpha=cfg.get("params_positional_alpha", False),
+                positional_phase=cfg.get("params_positional_phase", False),
             ),
         )
         loader = _test_loader(cfg["dataset_path"], args.batch_size, args.num_workers)
