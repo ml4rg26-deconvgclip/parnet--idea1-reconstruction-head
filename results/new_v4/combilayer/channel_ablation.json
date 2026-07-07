@@ -1,0 +1,9 @@
+{
+  "mean_r_full": 0.44353256546829145,
+  "mean_r_interference_zeroed": -0.06620730329290454,
+  "mean_r_mixed_zeroed": 0.3009593990823483,
+  "interference_contribution": 0.509739868761196,
+  "mixed_weight_norm": 4.278461933135986,
+  "interference_weight_norm": 3.348784923553467,
+  "interference_weight_fraction": 0.43905553105651357
+}
