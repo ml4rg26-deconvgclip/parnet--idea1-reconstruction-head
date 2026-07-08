@@ -1,6 +1,7 @@
 # ── Pretrained PARNET backbone ────────────────────────────────────────────────
 models:
   parnet.7m-0.0: "/mnt/storage1/ml4rg26-shared/parnet-eclip/models-full-rbp-set/parnet.7m-0.0.pt"
+  parnet.21m-5.0: "/mnt/storage1/ml4rg26-shared/parnet-eclip/models-full-rbp-set/parnet.21m-5.0.pt"
 
 # ── GlobalCLIP datasets (pt.gz) ───────────────────────────────────────────────
 data:

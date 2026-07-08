@@ -207,6 +207,7 @@ class GlobalCLIPStandardModel(nn.Module):
         num_rbps: int = 223,
         mix_hidden: int = 128,
         positional_alpha: bool = False,
+        embed_dim: int = 512,
     ):
         super().__init__()
         self.backbone = parnet_model
@@ -214,7 +215,7 @@ class GlobalCLIPStandardModel(nn.Module):
             p.requires_grad = False
 
         self.mix_coeff = MixCoeffHead(
-            embed_dim=512, num_tasks=num_rbps, hidden=mix_hidden, positional=positional_alpha
+            embed_dim=embed_dim, num_tasks=num_rbps, hidden=mix_hidden, positional=positional_alpha
         )
         self.log_scale = nn.Parameter(torch.zeros(num_rbps))
 
@@ -290,6 +291,7 @@ class GlobalCLIPQLayerModel(nn.Module):
         cnn_layers: int = 3,
         positional_alpha: bool = False,
         positional_phase: bool = False,
+        embed_dim: int = 512,
     ):
         super().__init__()
         self.backbone = parnet_model
@@ -297,10 +299,10 @@ class GlobalCLIPQLayerModel(nn.Module):
             p.requires_grad = False
 
         self.mix_coeff = MixCoeffHead(
-            embed_dim=512, num_tasks=num_rbps, hidden=mix_hidden, positional=positional_alpha
+            embed_dim=embed_dim, num_tasks=num_rbps, hidden=mix_hidden, positional=positional_alpha
         )
         self.log_scale = nn.Parameter(torch.zeros(num_rbps))
-        self.qlayer = QLayer(num_rbps=num_rbps, embed_dim=512, positional_phase=positional_phase)
+        self.qlayer = QLayer(num_rbps=num_rbps, embed_dim=embed_dim, positional_phase=positional_phase)
 
         # Dilated CNN to refine the local context after interference
         layers: list[nn.Module] = []
@@ -381,6 +383,7 @@ class GlobalCLIPCNNModel(nn.Module):
         cnn_kernel: int = 9,
         cnn_layers: int = 3,
         positional_alpha: bool = False,
+        embed_dim: int = 512,
     ):
         super().__init__()
         self.backbone = parnet_model
@@ -388,7 +391,7 @@ class GlobalCLIPCNNModel(nn.Module):
             p.requires_grad = False
 
         self.mix_coeff = MixCoeffHead(
-            embed_dim=512, num_tasks=num_rbps, hidden=mix_hidden, positional=positional_alpha
+            embed_dim=embed_dim, num_tasks=num_rbps, hidden=mix_hidden, positional=positional_alpha
         )
         self.log_scale = nn.Parameter(torch.zeros(num_rbps))
 
@@ -460,6 +463,7 @@ class GlobalCLIPHybridModel(nn.Module):
         cnn_layers: int = 3,
         positional_alpha: bool = False,
         positional_phase: bool = False,
+        embed_dim: int = 512,
     ):
         super().__init__()
         self.backbone = parnet_model
@@ -467,10 +471,10 @@ class GlobalCLIPHybridModel(nn.Module):
             p.requires_grad = False
 
         self.mix_coeff = MixCoeffHead(
-            embed_dim=512, num_tasks=num_rbps, hidden=mix_hidden, positional=positional_alpha
+            embed_dim=embed_dim, num_tasks=num_rbps, hidden=mix_hidden, positional=positional_alpha
         )
         self.log_scale = nn.Parameter(torch.zeros(num_rbps))
-        self.qlayer = QLayer(num_rbps=num_rbps, embed_dim=512, positional_phase=positional_phase)
+        self.qlayer = QLayer(num_rbps=num_rbps, embed_dim=embed_dim, positional_phase=positional_phase)
 
         layers: list[nn.Module] = []
         in_ch = 2                                                  # mixed + interference

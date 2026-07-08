@@ -38,6 +38,7 @@ from globalclip_utils import (
     GlobalCLIPCNNModel,
     save_run_config,
 )
+from globalclip_utils.model import _extract_parnet_features
 
 logging.basicConfig(
     level=logging.INFO,
@@ -72,6 +73,11 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--max-total-signal", type=float, default=None,
                     help="Drop windows with total signal above this value (e.g. 1000), "
                          "matching Idea 2's outlier-filtered dataset for a fair comparison.")
+    p.add_argument("--pretrained-model", default="parnet.7m-0.0",
+                    help="ParnetModelName value to use as backbone, e.g. 'parnet.7m-0.0' "
+                         "(default) or 'parnet.21m-5.0' -- must be registered under "
+                         "config/filepaths.server.yaml -> models. Embedding dimension is "
+                         "auto-detected from the loaded backbone, no need to set it manually.")
     return p.parse_args()
 
 
@@ -88,7 +94,7 @@ def main() -> None:
         log.warning("No GPU — running on CPU.")
 
     _fp_cfg = yaml.safe_load((PROJECT_DIR / "config" / "filepaths.server.yaml").read_text())
-    pretrained_model_name = ParnetModelName.PARNET_7M_0_0
+    pretrained_model_name = ParnetModelName(args.pretrained_model)
 
     def _res(p: str) -> Path:
         p = Path(p)
@@ -132,6 +138,12 @@ def main() -> None:
                                dtype=torch.float32, device=device)
     parnet.eval()
 
+    with torch.no_grad():
+        _probe_seq = train_ds[0]["sequence"].unsqueeze(0).to(device)
+        _embedding, _ = _extract_parnet_features(parnet, _probe_seq)
+        embed_dim = _embedding.shape[1]
+    log.info(f"Detected backbone embedding dim: {embed_dim}")
+
     model = GlobalCLIPCNNModel(
         parnet_model=parnet,
         num_rbps=args.num_rbps,
@@ -140,6 +152,7 @@ def main() -> None:
         cnn_kernel=args.cnn_kernel,
         cnn_layers=args.cnn_layers,
         positional_alpha=args.positional_alpha,
+        embed_dim=embed_dim,
     ).to(device)
 
     trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
@@ -203,6 +216,7 @@ def main() -> None:
         "params_cnn_layers":       args.cnn_layers,
         "params_positional_alpha": args.positional_alpha,
         "params_max_total_signal": args.max_total_signal,
+        "params_embed_dim": embed_dim,
         "params_lr":               args.lr,
         "params_max_epochs":       args.max_epochs,
         "params_lambda_nll":       args.lambda_nll,

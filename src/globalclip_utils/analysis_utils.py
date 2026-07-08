@@ -248,6 +248,124 @@ def plot_coupling_heatmap(
     return fig
 
 
+def _rank_last_dim(x: torch.Tensor) -> torch.Tensor:
+    order = x.argsort(dim=-1)
+    ranks = torch.empty_like(order, dtype=torch.float32)
+    arange = torch.arange(x.shape[-1], dtype=torch.float32, device=x.device).expand_as(x)
+    ranks.scatter_(-1, order, arange)
+    return ranks
+
+
+@torch.no_grad()
+def evaluate_spearman(
+    model: nn.Module, dataloader: torch.utils.data.DataLoader, device: torch.device,
+) -> tuple[float, np.ndarray]:
+    """Spearman rank correlation between prediction and log1p(signal), per sequence."""
+    model.eval()
+    corrs = []
+    for batch in dataloader:
+        seq, signal = batch["sequence"].to(device), batch["signal"].to(device)
+        pred, _ = model(seq)
+        target = torch.log1p(signal)
+        p, t = _rank_last_dim(pred.squeeze(1)), _rank_last_dim(target.squeeze(1))
+        pz, tz = p - p.mean(-1, keepdim=True), t - t.mean(-1, keepdim=True)
+        r = (pz * tz).sum(-1) / (pz.norm(dim=-1) * tz.norm(dim=-1) + 1e-8)
+        corrs.extend(r.cpu().float().numpy().tolist())
+    all_r = np.array(corrs)
+    return float(np.mean(all_r)), all_r
+
+
+def _smooth_last_dim(x: torch.Tensor, n_window: int) -> torch.Tensor:
+    if n_window <= 1:
+        return x
+    import torch.nn.functional as F
+    pad = n_window // 2
+    kernel = torch.ones(1, 1, n_window, device=x.device, dtype=x.dtype) / n_window
+    x_padded = F.pad(x.unsqueeze(1), (pad, pad), mode="replicate")
+    smoothed = F.conv1d(x_padded, kernel).squeeze(1)
+    return smoothed[..., : x.shape[-1]]
+
+
+@torch.no_grad()
+def evaluate_pearson_windowed(
+    model: nn.Module, dataloader: torch.utils.data.DataLoader, device: torch.device, n_window: int,
+) -> float:
+    """Mean Pearson r after smoothing pred/target with an n_window moving average."""
+    model.eval()
+    corrs = []
+    for batch in dataloader:
+        seq, signal = batch["sequence"].to(device), batch["signal"].to(device)
+        pred, _ = model(seq)
+        target = torch.log1p(signal)
+        p, t = _smooth_last_dim(pred.squeeze(1), n_window), _smooth_last_dim(target.squeeze(1), n_window)
+        pz, tz = p - p.mean(-1, keepdim=True), t - t.mean(-1, keepdim=True)
+        r = (pz * tz).sum(-1) / (pz.norm(dim=-1) * tz.norm(dim=-1) + 1e-8)
+        corrs.extend(r.cpu().float().numpy().tolist())
+    return float(np.mean(corrs))
+
+
+@torch.no_grad()
+def evaluate_pearson_subset(
+    model: nn.Module, dataloader: torch.utils.data.DataLoader, device: torch.device, max_batches: int,
+) -> float:
+    """Mean Pearson r over at most `max_batches` batches (cheap overfitting check
+    on the training split, without iterating the full training set)."""
+    model.eval()
+    corrs = []
+    for i, batch in enumerate(dataloader):
+        if i >= max_batches:
+            break
+        seq, signal = batch["sequence"].to(device), batch["signal"].to(device)
+        pred, _ = model(seq)
+        target = torch.log1p(signal)
+        p, t = pred.squeeze(1), target.squeeze(1)
+        pz, tz = p - p.mean(-1, keepdim=True), t - t.mean(-1, keepdim=True)
+        r = (pz * tz).sum(-1) / (pz.norm(dim=-1) * tz.norm(dim=-1) + 1e-8)
+        corrs.extend(r.cpu().float().numpy().tolist())
+    return float(np.mean(corrs))
+
+
+class NaiveBaselineModel(nn.Module):
+    """Sequence-agnostic baseline: uniform mean of the raw per-RBP eCLIP tracks."""
+
+    def __init__(self, parnet_model: nn.Module, num_rbps: int = 223):
+        super().__init__()
+        self.backbone = parnet_model
+        self.num_rbps = num_rbps
+
+    @torch.no_grad()
+    def forward(self, seq_onehot: torch.Tensor):
+        x = self.backbone.stem(seq_onehot)
+        x = self.backbone.body(x)
+        if hasattr(self.backbone, "projection"):
+            x = self.backbone.projection(x)
+        rbp_tracks = self.backbone.head.head_target.pointwise_conv(x)
+        pred = rbp_tracks.mean(dim=1, keepdim=True)
+        alpha = torch.full((seq_onehot.shape[0], self.num_rbps),
+                            1.0 / self.num_rbps, device=seq_onehot.device)
+        return pred, alpha
+
+
+def paired_significance(r_a: np.ndarray, r_b: np.ndarray) -> float:
+    """Wilcoxon signed-rank test p-value for r_b vs. r_a (paired, per-sequence)."""
+    from scipy.stats import wilcoxon
+    _, p = wilcoxon(r_b, r_a)
+    return float(p)
+
+
+def bootstrap_mean_diff_ci(
+    r_a: np.ndarray, r_b: np.ndarray, n_boot: int = 10000, seed: int = 42,
+) -> tuple[float, float, float]:
+    """Bootstrap 95% CI on the mean difference (r_b - r_a). Returns (mean_diff, ci_low, ci_high)."""
+    rng = np.random.default_rng(seed)
+    diffs = r_b - r_a
+    n = len(diffs)
+    boot_idx = rng.integers(0, n, size=(n_boot, n))
+    boot_means = diffs[boot_idx].mean(axis=1)
+    lo, hi = np.percentile(boot_means, [2.5, 97.5])
+    return float(diffs.mean()), float(lo), float(hi)
+
+
 def plot_pearson_distribution(
     all_r_standard: np.ndarray,
     all_r_qlayer: np.ndarray | None = None,
