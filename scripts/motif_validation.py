@@ -69,6 +69,9 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--max-motifs", type=int, default=15)
     p.add_argument("--align-script", default=str(_DEFAULT_ALIGN_SCRIPT))
     p.add_argument("--gpu", type=int, default=0)
+    p.add_argument("--pretrained-model", default="parnet.7m-0.0",
+                    help="ParnetModelName value for the backbone whose own per-protein "
+                         "tracks are attributed, e.g. 'parnet.7m-0.0' or 'parnet.21m-5.0'.")
     p.add_argument("--output-dir", default="results/motif_validation")
     return p.parse_args()
 
@@ -284,7 +287,7 @@ def main() -> None:
     device = torch.device(f"cuda:{args.gpu}" if torch.cuda.is_available() else "cpu")
 
     _fp_cfg = yaml.safe_load((PROJECT_DIR / "config" / "filepaths.server.yaml").read_text())
-    pretrained_model_name = ParnetModelName.PARNET_7M_0_0
+    pretrained_model_name = ParnetModelName(args.pretrained_model)
     pretrained_path = _res(_fp_cfg["models"][pretrained_model_name.value])
 
     parnet = load_parnet_model(pretrained_model_name, pretrained_path, dtype=torch.float32, device=device)
