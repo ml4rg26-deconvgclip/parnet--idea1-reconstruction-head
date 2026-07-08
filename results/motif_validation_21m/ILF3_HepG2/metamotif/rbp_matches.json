@@ -1,0 +1,170 @@
+{
+  "motif-0": [
+    {
+      "rbp": "PCBP2",
+      "pcc": 0.9269
+    },
+    {
+      "rbp": "ADARB1",
+      "pcc": 0.881
+    },
+    {
+      "rbp": "ZNF326",
+      "pcc": 0.8787
+    },
+    {
+      "rbp": "RBMX",
+      "pcc": 0.8754
+    },
+    {
+      "rbp": "PCBP4",
+      "pcc": 0.8296
+    },
+    {
+      "rbp": "TLR3",
+      "pcc": 0.8007
+    },
+    {
+      "rbp": "ILF3",
+      "pcc": 0.7992
+    },
+    {
+      "rbp": "TBRG4",
+      "pcc": 0.7924
+    },
+    {
+      "rbp": "LARP4",
+      "pcc": 0.7885
+    },
+    {
+      "rbp": "HNRNPK",
+      "pcc": 0.7798
+    }
+  ],
+  "motif-1": [
+    {
+      "rbp": "FUS",
+      "pcc": 0.8468
+    },
+    {
+      "rbp": "PIWIL1",
+      "pcc": 0.8208
+    },
+    {
+      "rbp": "HNRNPH1",
+      "pcc": 0.8071
+    },
+    {
+      "rbp": "HNRNPH2",
+      "pcc": 0.8071
+    },
+    {
+      "rbp": "HNRNPF",
+      "pcc": 0.8071
+    },
+    {
+      "rbp": "RBM24",
+      "pcc": 0.7957
+    },
+    {
+      "rbp": "HNRNPA2B1",
+      "pcc": 0.7957
+    },
+    {
+      "rbp": "HNRNPH3",
+      "pcc": 0.7957
+    },
+    {
+      "rbp": "KHSRP",
+      "pcc": 0.7721
+    },
+    {
+      "rbp": "3IVK",
+      "pcc": 0.7721
+    }
+  ],
+  "motif-2": [
+    {
+      "rbp": "4KZE",
+      "pcc": 0.9698
+    },
+    {
+      "rbp": "NFKB1",
+      "pcc": 0.9698
+    },
+    {
+      "rbp": "4KZD",
+      "pcc": 0.9698
+    },
+    {
+      "rbp": "4Q9Q",
+      "pcc": 0.9698
+    },
+    {
+      "rbp": "ELAVL2",
+      "pcc": 0.9698
+    },
+    {
+      "rbp": "DAZAP1",
+      "pcc": 0.9686
+    },
+    {
+      "rbp": "KHSRP",
+      "pcc": 0.9596
+    },
+    {
+      "rbp": "SRP54",
+      "pcc": 0.9579
+    },
+    {
+      "rbp": "HNRNPH1",
+      "pcc": 0.9161
+    },
+    {
+      "rbp": "HNRNPH2",
+      "pcc": 0.9161
+    }
+  ],
+  "motif-3": [
+    {
+      "rbp": "TERT",
+      "pcc": 0.9832
+    },
+    {
+      "rbp": "NFKB1",
+      "pcc": 0.9578
+    },
+    {
+      "rbp": "ELAVL2",
+      "pcc": 0.9578
+    },
+    {
+      "rbp": "CTHT_0057680",
+      "pcc": 0.95
+    },
+    {
+      "rbp": "PAP1",
+      "pcc": 0.95
+    },
+    {
+      "rbp": "RBMX",
+      "pcc": 0.95
+    },
+    {
+      "rbp": "RNASEL",
+      "pcc": 0.95
+    },
+    {
+      "rbp": "RRP6",
+      "pcc": 0.95
+    },
+    {
+      "rbp": "MTR4",
+      "pcc": 0.95
+    },
+    {
+      "rbp": "PABPC1",
+      "pcc": 0.95
+    }
+  ]
+}

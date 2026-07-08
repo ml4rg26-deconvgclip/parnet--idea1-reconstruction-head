@@ -1,0 +1,9 @@
+{
+  "baseline_mean_r": 0.1872299384458113,
+  "model_mean_r": 0.42672562783732276,
+  "mean_delta_r": 0.23949568939151147,
+  "bootstrap_ci_low": 0.236061869813659,
+  "bootstrap_ci_high": 0.24292292585154593,
+  "wilcoxon_p": 0.0,
+  "significant": true
+}

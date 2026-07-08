@@ -1,2 +1,2 @@
-model,mean_r,median_r,std_r,n_sequences
-standard,0.26378605749597506,0.25379906594753265,0.10687161666044759,4896
+model,mean_r,median_r,std_r,n_sequences,mean_spearman,mean_delta_r_vs_baseline,wilcoxon_p_vs_baseline
+standard,0.26378605749597506,0.25379906594753265,0.10687161666044759,4896,0.1020593963208584,0.07655611905016378,0.0

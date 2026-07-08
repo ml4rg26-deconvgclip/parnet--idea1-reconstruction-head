@@ -1,0 +1,44 @@
+{
+  "motif-0": [
+    {
+      "rbp": "SSB",
+      "pcc": 0.958
+    },
+    {
+      "rbp": "ELAVL1",
+      "pcc": 0.958
+    },
+    {
+      "rbp": "ELAVL2",
+      "pcc": 0.9372
+    },
+    {
+      "rbp": "TIA1",
+      "pcc": 0.9318
+    },
+    {
+      "rbp": "TIAL1",
+      "pcc": 0.9219
+    },
+    {
+      "rbp": "CPEB1",
+      "pcc": 0.9155
+    },
+    {
+      "rbp": "HNRNPCL1",
+      "pcc": 0.9
+    },
+    {
+      "rbp": "KHDRBS1",
+      "pcc": 0.8869
+    },
+    {
+      "rbp": "U2AF2",
+      "pcc": 0.8837
+    },
+    {
+      "rbp": "HNRNPC",
+      "pcc": 0.8837
+    }
+  ]
+}

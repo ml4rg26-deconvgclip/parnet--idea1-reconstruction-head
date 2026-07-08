@@ -1,0 +1,86 @@
+{
+  "motif-0": [
+    {
+      "rbp": "RBM6",
+      "pcc": 0.9254
+    },
+    {
+      "rbp": "HNRNPK",
+      "pcc": 0.9067
+    },
+    {
+      "rbp": "KHSRP",
+      "pcc": 0.9052
+    },
+    {
+      "rbp": "ILF3",
+      "pcc": 0.8874
+    },
+    {
+      "rbp": "PCBP2",
+      "pcc": 0.8463
+    },
+    {
+      "rbp": "PCBP1",
+      "pcc": 0.8463
+    },
+    {
+      "rbp": "DDX59",
+      "pcc": 0.8426
+    },
+    {
+      "rbp": "PCBP4",
+      "pcc": 0.8064
+    },
+    {
+      "rbp": "SRP19",
+      "pcc": 0.8011
+    },
+    {
+      "rbp": "SRP68",
+      "pcc": 0.8011
+    }
+  ],
+  "motif-1": [
+    {
+      "rbp": "SRP68",
+      "pcc": 0.946
+    },
+    {
+      "rbp": "TAF15",
+      "pcc": 0.9308
+    },
+    {
+      "rbp": "HNRNPA2B1",
+      "pcc": 0.9308
+    },
+    {
+      "rbp": "ILF2",
+      "pcc": 0.9308
+    },
+    {
+      "rbp": "HNRNPH1",
+      "pcc": 0.9301
+    },
+    {
+      "rbp": "HNRNPH2",
+      "pcc": 0.9301
+    },
+    {
+      "rbp": "HNRNPF",
+      "pcc": 0.9301
+    },
+    {
+      "rbp": "HNRNPH3",
+      "pcc": 0.9301
+    },
+    {
+      "rbp": "KHSRP",
+      "pcc": 0.9235
+    },
+    {
+      "rbp": "RBMX",
+      "pcc": 0.9001
+    }
+  ]
+}

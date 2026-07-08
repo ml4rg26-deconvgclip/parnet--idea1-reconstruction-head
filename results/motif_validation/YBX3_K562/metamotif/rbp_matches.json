@@ -1,0 +1,128 @@
+{
+  "motif-0": [
+    {
+      "rbp": "NCBP2",
+      "pcc": 0.9128
+    },
+    {
+      "rbp": "IGF2BP2",
+      "pcc": 0.8366
+    },
+    {
+      "rbp": "ADARB1",
+      "pcc": 0.8172
+    },
+    {
+      "rbp": "RBM23",
+      "pcc": 0.8169
+    },
+    {
+      "rbp": "XPO5",
+      "pcc": 0.8095
+    },
+    {
+      "rbp": "PUF68",
+      "pcc": 0.8032
+    },
+    {
+      "rbp": "SRSF5",
+      "pcc": 0.7986
+    },
+    {
+      "rbp": "SF1",
+      "pcc": 0.7887
+    },
+    {
+      "rbp": "HNRNPK",
+      "pcc": 0.752
+    },
+    {
+      "rbp": "HNRNPL",
+      "pcc": 0.744
+    }
+  ],
+  "motif-1": [
+    {
+      "rbp": "RBM23",
+      "pcc": 0.9152
+    },
+    {
+      "rbp": "HNRNPK",
+      "pcc": 0.8903
+    },
+    {
+      "rbp": "NXF1",
+      "pcc": 0.8695
+    },
+    {
+      "rbp": "HNRNPU",
+      "pcc": 0.8527
+    },
+    {
+      "rbp": "HNRNPA1",
+      "pcc": 0.8527
+    },
+    {
+      "rbp": "PTBP1",
+      "pcc": 0.8527
+    },
+    {
+      "rbp": "PCBP2",
+      "pcc": 0.8527
+    },
+    {
+      "rbp": "NOVA1",
+      "pcc": 0.8527
+    },
+    {
+      "rbp": "PCBP1",
+      "pcc": 0.8527
+    },
+    {
+      "rbp": "ELAVL1",
+      "pcc": 0.8527
+    }
+  ],
+  "motif-2": [
+    {
+      "rbp": "PCBP2",
+      "pcc": 0.9759
+    },
+    {
+      "rbp": "HNRNPK",
+      "pcc": 0.9539
+    },
+    {
+      "rbp": "HNRNPU",
+      "pcc": 0.9456
+    },
+    {
+      "rbp": "HNRNPA1",
+      "pcc": 0.9456
+    },
+    {
+      "rbp": "PTBP1",
+      "pcc": 0.9456
+    },
+    {
+      "rbp": "NOVA1",
+      "pcc": 0.9456
+    },
+    {
+      "rbp": "PCBP1",
+      "pcc": 0.9456
+    },
+    {
+      "rbp": "ELAVL1",
+      "pcc": 0.9456
+    },
+    {
+      "rbp": "RBM5",
+      "pcc": 0.9456
+    },
+    {
+      "rbp": "KHSRP",
+      "pcc": 0.9456
+    }
+  ]
+}

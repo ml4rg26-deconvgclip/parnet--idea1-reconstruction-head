@@ -1,0 +1,2 @@
+model,mean_r,median_r,std_r,n_sequences,mean_spearman,mean_delta_r_vs_baseline,wilcoxon_p_vs_baseline
+cnn_only,0.4756776000314287,0.47538650035858154,0.16282616257201057,4896,0.10962599223443416,0.2613611742310978,0.0

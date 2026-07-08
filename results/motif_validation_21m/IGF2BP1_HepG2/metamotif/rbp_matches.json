@@ -1,0 +1,170 @@
+{
+  "motif-0": [
+    {
+      "rbp": "HNRNPA1",
+      "pcc": 0.8842
+    },
+    {
+      "rbp": "RPO21",
+      "pcc": 0.7788
+    },
+    {
+      "rbp": "NOVA1",
+      "pcc": 0.7535
+    },
+    {
+      "rbp": "PCBP2",
+      "pcc": 0.7459
+    },
+    {
+      "rbp": "NFKB1",
+      "pcc": 0.7441
+    },
+    {
+      "rbp": "SRP54",
+      "pcc": 0.7441
+    },
+    {
+      "rbp": "HNRNPK",
+      "pcc": 0.7405
+    },
+    {
+      "rbp": "KHSRP",
+      "pcc": 0.7296
+    },
+    {
+      "rbp": "SRSF2",
+      "pcc": 0.7296
+    },
+    {
+      "rbp": "ERI1",
+      "pcc": 0.7279
+    }
+  ],
+  "motif-1": [
+    {
+      "rbp": "NXF1",
+      "pcc": 0.8042
+    },
+    {
+      "rbp": "SSB",
+      "pcc": 0.8017
+    },
+    {
+      "rbp": "SRP68",
+      "pcc": 0.8017
+    },
+    {
+      "rbp": "CELF1",
+      "pcc": 0.8017
+    },
+    {
+      "rbp": "FMR1",
+      "pcc": 0.7831
+    },
+    {
+      "rbp": "SRSF5",
+      "pcc": 0.778
+    },
+    {
+      "rbp": "RBM23",
+      "pcc": 0.7696
+    },
+    {
+      "rbp": "TLR3",
+      "pcc": 0.7646
+    },
+    {
+      "rbp": "SRSF6",
+      "pcc": 0.7644
+    },
+    {
+      "rbp": "IFIH1",
+      "pcc": 0.7473
+    }
+  ],
+  "motif-2": [
+    {
+      "rbp": "KHSRP",
+      "pcc": 0.9499
+    },
+    {
+      "rbp": "CELF2",
+      "pcc": 0.8479
+    },
+    {
+      "rbp": "CELF1",
+      "pcc": 0.8479
+    },
+    {
+      "rbp": "HNRNPF",
+      "pcc": 0.8315
+    },
+    {
+      "rbp": "SSB",
+      "pcc": 0.8168
+    },
+    {
+      "rbp": "ELAVL1",
+      "pcc": 0.8168
+    },
+    {
+      "rbp": "3IVK",
+      "pcc": 0.8057
+    },
+    {
+      "rbp": "HNRNPA1",
+      "pcc": 0.799
+    },
+    {
+      "rbp": "GRSF1",
+      "pcc": 0.7956
+    },
+    {
+      "rbp": "HNRNPH1",
+      "pcc": 0.7956
+    }
+  ],
+  "motif-3": [
+    {
+      "rbp": "PUF60",
+      "pcc": 0.9763
+    },
+    {
+      "rbp": "RALY",
+      "pcc": 0.9624
+    },
+    {
+      "rbp": "SSB",
+      "pcc": 0.9411
+    },
+    {
+      "rbp": "ELAVL1",
+      "pcc": 0.9411
+    },
+    {
+      "rbp": "U2AF2",
+      "pcc": 0.9291
+    },
+    {
+      "rbp": "HNRNPC",
+      "pcc": 0.9291
+    },
+    {
+      "rbp": "KHDRBS1",
+      "pcc": 0.9291
+    },
+    {
+      "rbp": "EIF4A3",
+      "pcc": 0.9291
+    },
+    {
+      "rbp": "DDX19B",
+      "pcc": 0.9291
+    },
+    {
+      "rbp": "DBP5",
+      "pcc": 0.9291
+    }
+  ]
+}

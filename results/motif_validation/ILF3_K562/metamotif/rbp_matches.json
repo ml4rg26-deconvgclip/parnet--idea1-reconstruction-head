@@ -1,0 +1,86 @@
+{
+  "motif-0": [
+    {
+      "rbp": "PCBP2",
+      "pcc": 0.9067
+    },
+    {
+      "rbp": "PTBP1",
+      "pcc": 0.8537
+    },
+    {
+      "rbp": "KHSRP",
+      "pcc": 0.8404
+    },
+    {
+      "rbp": "SRSF5",
+      "pcc": 0.8404
+    },
+    {
+      "rbp": "IFIH1",
+      "pcc": 0.8061
+    },
+    {
+      "rbp": "MSS116",
+      "pcc": 0.8018
+    },
+    {
+      "rbp": "HNRNPA1",
+      "pcc": 0.7804
+    },
+    {
+      "rbp": "ORB2",
+      "pcc": 0.776
+    },
+    {
+      "rbp": "RC3H1",
+      "pcc": 0.7685
+    },
+    {
+      "rbp": "CPEB4",
+      "pcc": 0.7661
+    }
+  ],
+  "motif-1": [
+    {
+      "rbp": "HNRNPH1",
+      "pcc": 0.9599
+    },
+    {
+      "rbp": "HNRNPH2",
+      "pcc": 0.9599
+    },
+    {
+      "rbp": "SRSF11",
+      "pcc": 0.958
+    },
+    {
+      "rbp": "LIN28A",
+      "pcc": 0.9539
+    },
+    {
+      "rbp": "SRSF1",
+      "pcc": 0.9538
+    },
+    {
+      "rbp": "SRSF9",
+      "pcc": 0.9393
+    },
+    {
+      "rbp": "HNRNPA1",
+      "pcc": 0.9183
+    },
+    {
+      "rbp": "HNRNPF",
+      "pcc": 0.9183
+    },
+    {
+      "rbp": "HNRNPH3",
+      "pcc": 0.9183
+    },
+    {
+      "rbp": "SRSF2",
+      "pcc": 0.9061
+    }
+  ]
+}

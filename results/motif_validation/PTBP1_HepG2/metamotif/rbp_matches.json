@@ -1,0 +1,86 @@
+{
+  "motif-0": [
+    {
+      "rbp": "RBM23",
+      "pcc": 0.9043
+    },
+    {
+      "rbp": "SRSF5",
+      "pcc": 0.8685
+    },
+    {
+      "rbp": "SRP68",
+      "pcc": 0.8635
+    },
+    {
+      "rbp": "HNRNPU",
+      "pcc": 0.8502
+    },
+    {
+      "rbp": "HNRNPK",
+      "pcc": 0.8502
+    },
+    {
+      "rbp": "HNRNPA1",
+      "pcc": 0.8502
+    },
+    {
+      "rbp": "PTBP1",
+      "pcc": 0.8502
+    },
+    {
+      "rbp": "PCBP2",
+      "pcc": 0.8502
+    },
+    {
+      "rbp": "NOVA1",
+      "pcc": 0.8502
+    },
+    {
+      "rbp": "PCBP1",
+      "pcc": 0.8502
+    }
+  ],
+  "motif-1": [
+    {
+      "rbp": "KHSRP",
+      "pcc": 1.0
+    },
+    {
+      "rbp": "HNRNPU",
+      "pcc": 1.0
+    },
+    {
+      "rbp": "HNRNPK",
+      "pcc": 1.0
+    },
+    {
+      "rbp": "HNRNPA1",
+      "pcc": 1.0
+    },
+    {
+      "rbp": "PTBP1",
+      "pcc": 1.0
+    },
+    {
+      "rbp": "PCBP2",
+      "pcc": 1.0
+    },
+    {
+      "rbp": "NOVA1",
+      "pcc": 1.0
+    },
+    {
+      "rbp": "PCBP1",
+      "pcc": 1.0
+    },
+    {
+      "rbp": "ELAVL1",
+      "pcc": 1.0
+    },
+    {
+      "rbp": "RBM5",
+      "pcc": 1.0
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "motif-0": [
+    {
+      "rbp": "CMTR1",
+      "pcc": 0.9598
+    },
+    {
+      "rbp": "SRSF3",
+      "pcc": 0.9598
+    },
+    {
+      "rbp": "YBX1",
+      "pcc": 0.9598
+    },
+    {
+      "rbp": "FUS",
+      "pcc": 0.8914
+    },
+    {
+      "rbp": "SFPQ",
+      "pcc": 0.8749
+    },
+    {
+      "rbp": "ESRP1",
+      "pcc": 0.8704
+    },
+    {
+      "rbp": "HNRNPH2",
+      "pcc": 0.8477
+    },
+    {
+      "rbp": "HNRNPA1",
+      "pcc": 0.8461
+    },
+    {
+      "rbp": "HNRNPH1",
+      "pcc": 0.8461
+    },
+    {
+      "rbp": "HNRNPF",
+      "pcc": 0.8461
+    }
+  ],
+  "motif-1": [
+    {
+      "rbp": "PCBP2",
+      "pcc": 0.9605
+    },
+    {
+      "rbp": "CPEB4",
+      "pcc": 0.9541
+    },
+    {
+      "rbp": "MUB",
+      "pcc": 0.9358
+    },
+    {
+      "rbp": "TIAL1",
+      "pcc": 0.85
+    },
+    {
+      "rbp": "PCBP1",
+      "pcc": 0.836
+    },
+    {
+      "rbp": "TIA1",
+      "pcc": 0.8313
+    },
+    {
+      "rbp": "RBM41",
+      "pcc": 0.797
+    },
+    {
+      "rbp": "PTBP1",
+      "pcc": 0.7958
+    },
+    {
+      "rbp": "RBM4",
+      "pcc": 0.7958
+    },
+    {
+      "rbp": "SRP14",
+      "pcc": 0.7958
+    }
+  ],
+  "motif-2": [
+    {
+      "rbp": "SXL",
+      "pcc": 1.0
+    },
+    {
+      "rbp": "ACO1",
+      "pcc": 0.8785
+    },
+    {
+      "rbp": "PRPF8",
+      "pcc": 0.8454
+    },
+    {
+      "rbp": "PPIG",
+      "pcc": 0.8339
+    },
+    {
+      "rbp": "LARP4",
+      "pcc": 0.8298
+    },
+    {
+      "rbp": "RBM22",
+      "pcc": 0.8255
+    },
+    {
+      "rbp": "HNRNPA1",
+      "pcc": 0.8226
+    },
+    {
+      "rbp": "FAM120A",
+      "pcc": 0.816
+    },
+    {
+      "rbp": "HNRNPU",
+      "pcc": 0.816
+    },
+    {
+      "rbp": "SRSF7",
+      "pcc": 0.8013
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "motif-0": [
+    {
+      "rbp": "PTBP1",
+      "pcc": 0.8681
+    },
+    {
+      "rbp": "HNRNPA1",
+      "pcc": 0.832
+    },
+    {
+      "rbp": "PIWIL1",
+      "pcc": 0.8247
+    },
+    {
+      "rbp": "G3BP2",
+      "pcc": 0.8153
+    },
+    {
+      "rbp": "KHSRP",
+      "pcc": 0.7979
+    },
+    {
+      "rbp": "SRSF2",
+      "pcc": 0.7979
+    },
+    {
+      "rbp": "PCBP2",
+      "pcc": 0.7962
+    },
+    {
+      "rbp": "SRSF9",
+      "pcc": 0.7918
+    },
+    {
+      "rbp": "CMTR1",
+      "pcc": 0.7848
+    },
+    {
+      "rbp": "SRSF3",
+      "pcc": 0.7848
+    }
+  ],
+  "motif-1": [
+    {
+      "rbp": "HNRNPA1",
+      "pcc": 0.9224
+    },
+    {
+      "rbp": "DAZAP1",
+      "pcc": 0.9224
+    },
+    {
+      "rbp": "TRA2B",
+      "pcc": 0.9224
+    },
+    {
+      "rbp": "HNRNPA2B1",
+      "pcc": 0.9224
+    },
+    {
+      "rbp": "YBX1",
+      "pcc": 0.9224
+    },
+    {
+      "rbp": "BRADI2G00245",
+      "pcc": 0.9126
+    },
+    {
+      "rbp": "PABPN1",
+      "pcc": 0.891
+    },
+    {
+      "rbp": "F2",
+      "pcc": 0.8831
+    },
+    {
+      "rbp": "SRSF1",
+      "pcc": 0.8766
+    },
+    {
+      "rbp": "HNRNPH1",
+      "pcc": 0.8614
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+{
+  "motif-0": [
+    {
+      "rbp": "PIWIL1",
+      "pcc": 0.9683
+    },
+    {
+      "rbp": "MBNL1",
+      "pcc": 0.9559
+    },
+    {
+      "rbp": "TIAL1",
+      "pcc": 0.9292
+    },
+    {
+      "rbp": "TIA1",
+      "pcc": 0.925
+    },
+    {
+      "rbp": "RC3H1",
+      "pcc": 0.9202
+    },
+    {
+      "rbp": "ELAVL2",
+      "pcc": 0.9078
+    },
+    {
+      "rbp": "CPEB4",
+      "pcc": 0.9015
+    },
+    {
+      "rbp": "XPO5",
+      "pcc": 0.8939
+    },
+    {
+      "rbp": "IFIH1",
+      "pcc": 0.8563
+    },
+    {
+      "rbp": "RBM15B",
+      "pcc": 0.8352
+    }
+  ],
+  "motif-1": [
+    {
+      "rbp": "TERT",
+      "pcc": 0.9639
+    },
+    {
+      "rbp": "SRP68",
+      "pcc": 0.9449
+    },
+    {
+      "rbp": "RBMX",
+      "pcc": 0.8816
+    },
+    {
+      "rbp": "ZRANB2",
+      "pcc": 0.8703
+    },
+    {
+      "rbp": "NCBP2",
+      "pcc": 0.8607
+    },
+    {
+      "rbp": "HNRNPH1",
+      "pcc": 0.8512
+    },
+    {
+      "rbp": "HNRNPH2",
+      "pcc": 0.8512
+    },
+    {
+      "rbp": "TRA2A",
+      "pcc": 0.8512
+    },
+    {
+      "rbp": "HNRNPDL",
+      "pcc": 0.8393
+    },
+    {
+      "rbp": "SFPQ",
+      "pcc": 0.8378
+    }
+  ],
+  "motif-2": [
+    {
+      "rbp": "LIN28A",
+      "pcc": 0.9248
+    },
+    {
+      "rbp": "NFKB1",
+      "pcc": 0.8986
+    },
+    {
+      "rbp": "DDX58",
+      "pcc": 0.8986
+    },
+    {
+      "rbp": "SRSF1",
+      "pcc": 0.8779
+    },
+    {
+      "rbp": "HNRNPC",
+      "pcc": 0.8779
+    },
+    {
+      "rbp": "EIF4G2",
+      "pcc": 0.8536
+    },
+    {
+      "rbp": "MBL",
+      "pcc": 0.8429
+    },
+    {
+      "rbp": "ZNF326",
+      "pcc": 0.8199
+    },
+    {
+      "rbp": "SRSF2",
+      "pcc": 0.7657
+    },
+    {
+      "rbp": "SRSF6",
+      "pcc": 0.7585
+    }
+  ],
+  "motif-3": [
+    {
+      "rbp": "ADARB1",
+      "pcc": 0.8556
+    },
+    {
+      "rbp": "IGF2BP3",
+      "pcc": 0.8535
+    },
+    {
+      "rbp": "HNRNPK",
+      "pcc": 0.8316
+    },
+    {
+      "rbp": "NOVA2",
+      "pcc": 0.8295
+    },
+    {
+      "rbp": "MSS116",
+      "pcc": 0.7968
+    },
+    {
+      "rbp": "NOVA1",
+      "pcc": 0.7907
+    },
+    {
+      "rbp": "HNRNPA1",
+      "pcc": 0.781
+    },
+    {
+      "rbp": "HNRNPC",
+      "pcc": 0.781
+    },
+    {
+      "rbp": "ELAVL3",
+      "pcc": 0.781
+    },
+    {
+      "rbp": "HNRNPD",
+      "pcc": 0.781
+    }
+  ]
+}

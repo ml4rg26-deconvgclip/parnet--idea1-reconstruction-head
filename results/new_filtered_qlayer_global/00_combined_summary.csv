@@ -1,2 +1,2 @@
-model,mean_r,median_r,std_r,n_sequences
-qlayer,0.4059677400824494,0.40493425726890564,0.15587238095359301,4896
+model,mean_r,median_r,std_r,n_sequences,mean_spearman,mean_delta_r_vs_baseline,wilcoxon_p_vs_baseline
+qlayer,0.4059677400824494,0.40493425726890564,0.15587238095359301,4896,0.10599684637686789,0.21873780163663814,0.0

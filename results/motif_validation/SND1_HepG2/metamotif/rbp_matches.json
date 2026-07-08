@@ -1,0 +1,86 @@
+{
+  "motif-0": [
+    {
+      "rbp": "MSS116",
+      "pcc": 0.8642
+    },
+    {
+      "rbp": "KHDRBS1",
+      "pcc": 0.8621
+    },
+    {
+      "rbp": "SRSF6",
+      "pcc": 0.8502
+    },
+    {
+      "rbp": "HNRNPDL",
+      "pcc": 0.8276
+    },
+    {
+      "rbp": "PUM1",
+      "pcc": 0.8276
+    },
+    {
+      "rbp": "CTHT_0057680",
+      "pcc": 0.8038
+    },
+    {
+      "rbp": "PAP1",
+      "pcc": 0.8038
+    },
+    {
+      "rbp": "RBMX",
+      "pcc": 0.8038
+    },
+    {
+      "rbp": "RNASEL",
+      "pcc": 0.8038
+    },
+    {
+      "rbp": "RRP6",
+      "pcc": 0.8038
+    }
+  ],
+  "motif-1": [
+    {
+      "rbp": "TRA2A",
+      "pcc": 0.9569
+    },
+    {
+      "rbp": "HNRNPH1",
+      "pcc": 0.9569
+    },
+    {
+      "rbp": "HNRNPH2",
+      "pcc": 0.9569
+    },
+    {
+      "rbp": "TRA2B",
+      "pcc": 0.9569
+    },
+    {
+      "rbp": "BRADI2G00245",
+      "pcc": 0.9569
+    },
+    {
+      "rbp": "SRSF2",
+      "pcc": 0.9401
+    },
+    {
+      "rbp": "SRSF11",
+      "pcc": 0.9401
+    },
+    {
+      "rbp": "F2",
+      "pcc": 0.928
+    },
+    {
+      "rbp": "HNRNPA1",
+      "pcc": 0.9213
+    },
+    {
+      "rbp": "HNRNPDL",
+      "pcc": 0.9213
+    }
+  ]
+}

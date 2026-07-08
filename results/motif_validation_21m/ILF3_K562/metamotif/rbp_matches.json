@@ -1,0 +1,86 @@
+{
+  "motif-0": [
+    {
+      "rbp": "KHSRP",
+      "pcc": 0.8688
+    },
+    {
+      "rbp": "HNRNPA1",
+      "pcc": 0.8688
+    },
+    {
+      "rbp": "SRSF2",
+      "pcc": 0.8688
+    },
+    {
+      "rbp": "HEN1",
+      "pcc": 0.8134
+    },
+    {
+      "rbp": "PCBP2",
+      "pcc": 0.7736
+    },
+    {
+      "rbp": "TIAL1",
+      "pcc": 0.7708
+    },
+    {
+      "rbp": "TIA1",
+      "pcc": 0.755
+    },
+    {
+      "rbp": "CDC40",
+      "pcc": 0.7483
+    },
+    {
+      "rbp": "CG7903",
+      "pcc": 0.7429
+    },
+    {
+      "rbp": "PCBP1",
+      "pcc": 0.7399
+    }
+  ],
+  "motif-1": [
+    {
+      "rbp": "HNRNPH1",
+      "pcc": 0.9779
+    },
+    {
+      "rbp": "SRSF9",
+      "pcc": 0.97
+    },
+    {
+      "rbp": "HNRNPA1",
+      "pcc": 0.9623
+    },
+    {
+      "rbp": "HNRNPH2",
+      "pcc": 0.9623
+    },
+    {
+      "rbp": "HNRNPF",
+      "pcc": 0.9623
+    },
+    {
+      "rbp": "HNRNPH3",
+      "pcc": 0.9623
+    },
+    {
+      "rbp": "NFKB1",
+      "pcc": 0.955
+    },
+    {
+      "rbp": "ELAVL2",
+      "pcc": 0.955
+    },
+    {
+      "rbp": "KHSRP",
+      "pcc": 0.9549
+    },
+    {
+      "rbp": "RO3G_00049",
+      "pcc": 0.9421
+    }
+  ]
+}

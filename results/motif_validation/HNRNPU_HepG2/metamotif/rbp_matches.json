@@ -1,0 +1,86 @@
+{
+  "motif-0": [
+    {
+      "rbp": "ADARB1",
+      "pcc": 0.8927
+    },
+    {
+      "rbp": "RBM22",
+      "pcc": 0.8751
+    },
+    {
+      "rbp": "MSS116",
+      "pcc": 0.833
+    },
+    {
+      "rbp": "SRSF5",
+      "pcc": 0.8242
+    },
+    {
+      "rbp": "SRP68",
+      "pcc": 0.8158
+    },
+    {
+      "rbp": "ZRANB2",
+      "pcc": 0.7995
+    },
+    {
+      "rbp": "SRP14",
+      "pcc": 0.7931
+    },
+    {
+      "rbp": "TARDBP",
+      "pcc": 0.7818
+    },
+    {
+      "rbp": "PUM2",
+      "pcc": 0.7662
+    },
+    {
+      "rbp": "NUDT21",
+      "pcc": 0.7662
+    }
+  ],
+  "motif-1": [
+    {
+      "rbp": "PTBP1",
+      "pcc": 0.9875
+    },
+    {
+      "rbp": "RBMX",
+      "pcc": 0.9875
+    },
+    {
+      "rbp": "HNRNPK",
+      "pcc": 0.9863
+    },
+    {
+      "rbp": "KHSRP",
+      "pcc": 0.9848
+    },
+    {
+      "rbp": "HNRNPU",
+      "pcc": 0.9848
+    },
+    {
+      "rbp": "HNRNPA1",
+      "pcc": 0.9848
+    },
+    {
+      "rbp": "PCBP2",
+      "pcc": 0.9848
+    },
+    {
+      "rbp": "NOVA1",
+      "pcc": 0.9848
+    },
+    {
+      "rbp": "PCBP1",
+      "pcc": 0.9848
+    },
+    {
+      "rbp": "ELAVL1",
+      "pcc": 0.9848
+    }
+  ]
+}

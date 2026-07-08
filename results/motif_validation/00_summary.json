@@ -1,0 +1,1616 @@
+[
+  {
+    "protein": "PTBP1_HepG2",
+    "status": "ok",
+    "n_consensus_motifs": 2,
+    "self_match": {
+      "motif": "motif-0",
+      "rbp": "PTBP1",
+      "pcc": 0.8502
+    },
+    "matches": {
+      "motif-0": [
+        {
+          "rbp": "RBM23",
+          "pcc": 0.9043
+        },
+        {
+          "rbp": "SRSF5",
+          "pcc": 0.8685
+        },
+        {
+          "rbp": "SRP68",
+          "pcc": 0.8635
+        },
+        {
+          "rbp": "HNRNPU",
+          "pcc": 0.8502
+        },
+        {
+          "rbp": "HNRNPK",
+          "pcc": 0.8502
+        },
+        {
+          "rbp": "HNRNPA1",
+          "pcc": 0.8502
+        },
+        {
+          "rbp": "PTBP1",
+          "pcc": 0.8502
+        },
+        {
+          "rbp": "PCBP2",
+          "pcc": 0.8502
+        },
+        {
+          "rbp": "NOVA1",
+          "pcc": 0.8502
+        },
+        {
+          "rbp": "PCBP1",
+          "pcc": 0.8502
+        }
+      ],
+      "motif-1": [
+        {
+          "rbp": "KHSRP",
+          "pcc": 1.0
+        },
+        {
+          "rbp": "HNRNPU",
+          "pcc": 1.0
+        },
+        {
+          "rbp": "HNRNPK",
+          "pcc": 1.0
+        },
+        {
+          "rbp": "HNRNPA1",
+          "pcc": 1.0
+        },
+        {
+          "rbp": "PTBP1",
+          "pcc": 1.0
+        },
+        {
+          "rbp": "PCBP2",
+          "pcc": 1.0
+        },
+        {
+          "rbp": "NOVA1",
+          "pcc": 1.0
+        },
+        {
+          "rbp": "PCBP1",
+          "pcc": 1.0
+        },
+        {
+          "rbp": "ELAVL1",
+          "pcc": 1.0
+        },
+        {
+          "rbp": "RBM5",
+          "pcc": 1.0
+        }
+      ]
+    }
+  },
+  {
+    "protein": "KHSRP_K562",
+    "status": "ok",
+    "n_consensus_motifs": 3,
+    "self_match": {
+      "motif": "motif-1",
+      "rbp": "KHSRP",
+      "pcc": 0.8896
+    },
+    "matches": {
+      "motif-0": [
+        {
+          "rbp": "XPO5",
+          "pcc": 0.9642
+        },
+        {
+          "rbp": "CELF2",
+          "pcc": 0.9635
+        },
+        {
+          "rbp": "CELF1",
+          "pcc": 0.9635
+        },
+        {
+          "rbp": "ARET",
+          "pcc": 0.934
+        },
+        {
+          "rbp": "RNA15",
+          "pcc": 0.8957
+        },
+        {
+          "rbp": "PAPI",
+          "pcc": 0.8943
+        },
+        {
+          "rbp": "DAZ3",
+          "pcc": 0.8837
+        },
+        {
+          "rbp": "SSB",
+          "pcc": 0.8823
+        },
+        {
+          "rbp": "ELAVL1",
+          "pcc": 0.8823
+        },
+        {
+          "rbp": "NOVA1",
+          "pcc": 0.8761
+        }
+      ],
+      "motif-1": [
+        {
+          "rbp": "HNRNPA1",
+          "pcc": 0.9029
+        },
+        {
+          "rbp": "NFKB1",
+          "pcc": 0.9013
+        },
+        {
+          "rbp": "SRP54",
+          "pcc": 0.9013
+        },
+        {
+          "rbp": "KHSRP",
+          "pcc": 0.8896
+        },
+        {
+          "rbp": "RBM5",
+          "pcc": 0.8775
+        },
+        {
+          "rbp": "SXL",
+          "pcc": 0.8436
+        },
+        {
+          "rbp": "ADARB1",
+          "pcc": 0.8308
+        },
+        {
+          "rbp": "FUS",
+          "pcc": 0.8308
+        },
+        {
+          "rbp": "SFPQ",
+          "pcc": 0.8286
+        },
+        {
+          "rbp": "ZRANB2",
+          "pcc": 0.8243
+        }
+      ],
+      "motif-2": [
+        {
+          "rbp": "SRP14",
+          "pcc": 0.9438
+        },
+        {
+          "rbp": "CG7804",
+          "pcc": 0.9384
+        },
+        {
+          "rbp": "ADARB1",
+          "pcc": 0.8773
+        },
+        {
+          "rbp": "FUS",
+          "pcc": 0.8773
+        },
+        {
+          "rbp": "EWSR1",
+          "pcc": 0.8773
+        },
+        {
+          "rbp": "RBM24",
+          "pcc": 0.865
+        },
+        {
+          "rbp": "SUP-12",
+          "pcc": 0.8444
+        },
+        {
+          "rbp": "CELF1",
+          "pcc": 0.8444
+        },
+        {
+          "rbp": "HNRNPM",
+          "pcc": 0.8302
+        },
+        {
+          "rbp": "IFIH1",
+          "pcc": 0.8296
+        }
+      ]
+    }
+  },
+  {
+    "protein": "PABPN1_HepG2",
+    "status": "ok",
+    "n_consensus_motifs": 4,
+    "self_match": {
+      "motif": "motif-0",
+      "rbp": "PABPN1",
+      "pcc": 0.9179
+    },
+    "matches": {
+      "motif-0": [
+        {
+          "rbp": "F2",
+          "pcc": 0.979
+        },
+        {
+          "rbp": "TERT",
+          "pcc": 0.938
+        },
+        {
+          "rbp": "PABPN1",
+          "pcc": 0.9179
+        },
+        {
+          "rbp": "SRSF2",
+          "pcc": 0.9114
+        },
+        {
+          "rbp": "CMTR1",
+          "pcc": 0.8991
+        },
+        {
+          "rbp": "SRSF3",
+          "pcc": 0.8991
+        },
+        {
+          "rbp": "YBX1",
+          "pcc": 0.8991
+        },
+        {
+          "rbp": "TRA2A",
+          "pcc": 0.8979
+        },
+        {
+          "rbp": "SRSF1",
+          "pcc": 0.8771
+        },
+        {
+          "rbp": "TRA2B",
+          "pcc": 0.8425
+        }
+      ],
+      "motif-1": [
+        {
+          "rbp": "PCBP2",
+          "pcc": 0.9018
+        },
+        {
+          "rbp": "NXF1",
+          "pcc": 0.8851
+        },
+        {
+          "rbp": "RBM23",
+          "pcc": 0.8715
+        },
+        {
+          "rbp": "KHSRP",
+          "pcc": 0.8549
+        },
+        {
+          "rbp": "SRSF5",
+          "pcc": 0.8295
+        },
+        {
+          "rbp": "HNRNPA1",
+          "pcc": 0.8277
+        },
+        {
+          "rbp": "HNRNPK",
+          "pcc": 0.8014
+        },
+        {
+          "rbp": "PIWIL1",
+          "pcc": 0.7892
+        },
+        {
+          "rbp": "TLR3",
+          "pcc": 0.775
+        },
+        {
+          "rbp": "RBM6",
+          "pcc": 0.7693
+        }
+      ],
+      "motif-2": [
+        {
+          "rbp": "NFKB1",
+          "pcc": 0.9246
+        },
+        {
+          "rbp": "SRP54",
+          "pcc": 0.9246
+        },
+        {
+          "rbp": "RBM5",
+          "pcc": 0.9178
+        },
+        {
+          "rbp": "ZRANB2",
+          "pcc": 0.9076
+        },
+        {
+          "rbp": "ZFP36",
+          "pcc": 0.9004
+        },
+        {
+          "rbp": "SF1",
+          "pcc": 0.9004
+        },
+        {
+          "rbp": "ELAVL4",
+          "pcc": 0.9004
+        },
+        {
+          "rbp": "HNRNPDL",
+          "pcc": 0.8866
+        },
+        {
+          "rbp": "SRSF2",
+          "pcc": 0.8782
+        },
+        {
+          "rbp": "HNRNPU",
+          "pcc": 0.8676
+        }
+      ],
+      "motif-3": [
+        {
+          "rbp": "CMTR1",
+          "pcc": 0.9883
+        },
+        {
+          "rbp": "SRSF3",
+          "pcc": 0.9883
+        },
+        {
+          "rbp": "YBX1",
+          "pcc": 0.9883
+        },
+        {
+          "rbp": "PHAX",
+          "pcc": 0.9755
+        },
+        {
+          "rbp": "DDX58",
+          "pcc": 0.8869
+        },
+        {
+          "rbp": "FRP",
+          "pcc": 0.8605
+        },
+        {
+          "rbp": "SRP19",
+          "pcc": 0.8248
+        },
+        {
+          "rbp": "SRP68",
+          "pcc": 0.8248
+        },
+        {
+          "rbp": "SRP54",
+          "pcc": 0.8248
+        },
+        {
+          "rbp": "RBP1",
+          "pcc": 0.7682
+        }
+      ]
+    }
+  },
+  {
+    "protein": "HNRNPC_K562",
+    "status": "ok",
+    "n_consensus_motifs": 2,
+    "self_match": {
+      "motif": "motif-1",
+      "rbp": "HNRNPC",
+      "pcc": 0.9866
+    },
+    "matches": {
+      "motif-0": [
+        {
+          "rbp": "PTBP1",
+          "pcc": 0.8967
+        },
+        {
+          "rbp": "SSB",
+          "pcc": 0.8416
+        },
+        {
+          "rbp": "ELAVL1",
+          "pcc": 0.8416
+        },
+        {
+          "rbp": "CPEB4",
+          "pcc": 0.8079
+        },
+        {
+          "rbp": "KHSRP",
+          "pcc": 0.8005
+        },
+        {
+          "rbp": "CELF2",
+          "pcc": 0.7837
+        },
+        {
+          "rbp": "TBG972.6.2300",
+          "pcc": 0.7781
+        },
+        {
+          "rbp": "CELF1",
+          "pcc": 0.7766
+        },
+        {
+          "rbp": "FNE",
+          "pcc": 0.7653
+        },
+        {
+          "rbp": "TIA1",
+          "pcc": 0.7651
+        }
+      ],
+      "motif-1": [
+        {
+          "rbp": "KHSRP",
+          "pcc": 0.9883
+        },
+        {
+          "rbp": "KHDRBS1",
+          "pcc": 0.9883
+        },
+        {
+          "rbp": "CPEB1",
+          "pcc": 0.9883
+        },
+        {
+          "rbp": "U2AF2",
+          "pcc": 0.9866
+        },
+        {
+          "rbp": "HNRNPC",
+          "pcc": 0.9866
+        },
+        {
+          "rbp": "SSB",
+          "pcc": 0.9866
+        },
+        {
+          "rbp": "ELAVL1",
+          "pcc": 0.9866
+        },
+        {
+          "rbp": "RBM15B",
+          "pcc": 0.9708
+        },
+        {
+          "rbp": "HNRNPCL1",
+          "pcc": 0.9695
+        },
+        {
+          "rbp": "PUF60",
+          "pcc": 0.9297
+        }
+      ]
+    }
+  },
+  {
+    "protein": "HNRNPC_HepG2",
+    "status": "ok",
+    "n_consensus_motifs": 1,
+    "self_match": {
+      "motif": "motif-0",
+      "rbp": "HNRNPCL1",
+      "pcc": 0.9
+    },
+    "matches": {
+      "motif-0": [
+        {
+          "rbp": "SSB",
+          "pcc": 0.958
+        },
+        {
+          "rbp": "ELAVL1",
+          "pcc": 0.958
+        },
+        {
+          "rbp": "ELAVL2",
+          "pcc": 0.9372
+        },
+        {
+          "rbp": "TIA1",
+          "pcc": 0.9318
+        },
+        {
+          "rbp": "TIAL1",
+          "pcc": 0.9219
+        },
+        {
+          "rbp": "CPEB1",
+          "pcc": 0.9155
+        },
+        {
+          "rbp": "HNRNPCL1",
+          "pcc": 0.9
+        },
+        {
+          "rbp": "KHDRBS1",
+          "pcc": 0.8869
+        },
+        {
+          "rbp": "U2AF2",
+          "pcc": 0.8837
+        },
+        {
+          "rbp": "HNRNPC",
+          "pcc": 0.8837
+        }
+      ]
+    }
+  },
+  {
+    "protein": "SND1_HepG2",
+    "status": "ok",
+    "n_consensus_motifs": 2,
+    "self_match": null,
+    "matches": {
+      "motif-0": [
+        {
+          "rbp": "MSS116",
+          "pcc": 0.8642
+        },
+        {
+          "rbp": "KHDRBS1",
+          "pcc": 0.8621
+        },
+        {
+          "rbp": "SRSF6",
+          "pcc": 0.8502
+        },
+        {
+          "rbp": "HNRNPDL",
+          "pcc": 0.8276
+        },
+        {
+          "rbp": "PUM1",
+          "pcc": 0.8276
+        },
+        {
+          "rbp": "CTHT_0057680",
+          "pcc": 0.8038
+        },
+        {
+          "rbp": "PAP1",
+          "pcc": 0.8038
+        },
+        {
+          "rbp": "RBMX",
+          "pcc": 0.8038
+        },
+        {
+          "rbp": "RNASEL",
+          "pcc": 0.8038
+        },
+        {
+          "rbp": "RRP6",
+          "pcc": 0.8038
+        }
+      ],
+      "motif-1": [
+        {
+          "rbp": "TRA2A",
+          "pcc": 0.9569
+        },
+        {
+          "rbp": "HNRNPH1",
+          "pcc": 0.9569
+        },
+        {
+          "rbp": "HNRNPH2",
+          "pcc": 0.9569
+        },
+        {
+          "rbp": "TRA2B",
+          "pcc": 0.9569
+        },
+        {
+          "rbp": "BRADI2G00245",
+          "pcc": 0.9569
+        },
+        {
+          "rbp": "SRSF2",
+          "pcc": 0.9401
+        },
+        {
+          "rbp": "SRSF11",
+          "pcc": 0.9401
+        },
+        {
+          "rbp": "F2",
+          "pcc": 0.928
+        },
+        {
+          "rbp": "HNRNPA1",
+          "pcc": 0.9213
+        },
+        {
+          "rbp": "HNRNPDL",
+          "pcc": 0.9213
+        }
+      ]
+    }
+  },
+  {
+    "protein": "DGCR8_K562",
+    "status": "ok",
+    "n_consensus_motifs": 4,
+    "self_match": null,
+    "matches": {
+      "motif-0": [
+        {
+          "rbp": "PIWIL1",
+          "pcc": 0.9683
+        },
+        {
+          "rbp": "MBNL1",
+          "pcc": 0.9559
+        },
+        {
+          "rbp": "TIAL1",
+          "pcc": 0.9292
+        },
+        {
+          "rbp": "TIA1",
+          "pcc": 0.925
+        },
+        {
+          "rbp": "RC3H1",
+          "pcc": 0.9202
+        },
+        {
+          "rbp": "ELAVL2",
+          "pcc": 0.9078
+        },
+        {
+          "rbp": "CPEB4",
+          "pcc": 0.9015
+        },
+        {
+          "rbp": "XPO5",
+          "pcc": 0.8939
+        },
+        {
+          "rbp": "IFIH1",
+          "pcc": 0.8563
+        },
+        {
+          "rbp": "RBM15B",
+          "pcc": 0.8352
+        }
+      ],
+      "motif-1": [
+        {
+          "rbp": "TERT",
+          "pcc": 0.9639
+        },
+        {
+          "rbp": "SRP68",
+          "pcc": 0.9449
+        },
+        {
+          "rbp": "RBMX",
+          "pcc": 0.8816
+        },
+        {
+          "rbp": "ZRANB2",
+          "pcc": 0.8703
+        },
+        {
+          "rbp": "NCBP2",
+          "pcc": 0.8607
+        },
+        {
+          "rbp": "HNRNPH1",
+          "pcc": 0.8512
+        },
+        {
+          "rbp": "HNRNPH2",
+          "pcc": 0.8512
+        },
+        {
+          "rbp": "TRA2A",
+          "pcc": 0.8512
+        },
+        {
+          "rbp": "HNRNPDL",
+          "pcc": 0.8393
+        },
+        {
+          "rbp": "SFPQ",
+          "pcc": 0.8378
+        }
+      ],
+      "motif-2": [
+        {
+          "rbp": "LIN28A",
+          "pcc": 0.9248
+        },
+        {
+          "rbp": "NFKB1",
+          "pcc": 0.8986
+        },
+        {
+          "rbp": "DDX58",
+          "pcc": 0.8986
+        },
+        {
+          "rbp": "SRSF1",
+          "pcc": 0.8779
+        },
+        {
+          "rbp": "HNRNPC",
+          "pcc": 0.8779
+        },
+        {
+          "rbp": "EIF4G2",
+          "pcc": 0.8536
+        },
+        {
+          "rbp": "MBL",
+          "pcc": 0.8429
+        },
+        {
+          "rbp": "ZNF326",
+          "pcc": 0.8199
+        },
+        {
+          "rbp": "SRSF2",
+          "pcc": 0.7657
+        },
+        {
+          "rbp": "SRSF6",
+          "pcc": 0.7585
+        }
+      ],
+      "motif-3": [
+        {
+          "rbp": "ADARB1",
+          "pcc": 0.8556
+        },
+        {
+          "rbp": "IGF2BP3",
+          "pcc": 0.8535
+        },
+        {
+          "rbp": "HNRNPK",
+          "pcc": 0.8316
+        },
+        {
+          "rbp": "NOVA2",
+          "pcc": 0.8295
+        },
+        {
+          "rbp": "MSS116",
+          "pcc": 0.7968
+        },
+        {
+          "rbp": "NOVA1",
+          "pcc": 0.7907
+        },
+        {
+          "rbp": "HNRNPA1",
+          "pcc": 0.781
+        },
+        {
+          "rbp": "HNRNPC",
+          "pcc": 0.781
+        },
+        {
+          "rbp": "ELAVL3",
+          "pcc": 0.781
+        },
+        {
+          "rbp": "HNRNPD",
+          "pcc": 0.781
+        }
+      ]
+    }
+  },
+  {
+    "protein": "NONO_K562",
+    "status": "ok",
+    "n_consensus_motifs": 1,
+    "self_match": null,
+    "matches": {
+      "motif-0": [
+        {
+          "rbp": "SRSF5",
+          "pcc": 0.8743
+        },
+        {
+          "rbp": "HEN1",
+          "pcc": 0.8415
+        },
+        {
+          "rbp": "RBM23",
+          "pcc": 0.8198
+        },
+        {
+          "rbp": "PCBP2",
+          "pcc": 0.8029
+        },
+        {
+          "rbp": "KHSRP",
+          "pcc": 0.788
+        },
+        {
+          "rbp": "HNRNPA1",
+          "pcc": 0.788
+        },
+        {
+          "rbp": "SRSF2",
+          "pcc": 0.788
+        },
+        {
+          "rbp": "XPO5",
+          "pcc": 0.7607
+        },
+        {
+          "rbp": "RPO21",
+          "pcc": 0.7576
+        },
+        {
+          "rbp": "MSS116",
+          "pcc": 0.7576
+        }
+      ]
+    }
+  },
+  {
+    "protein": "LSM11_K562",
+    "status": "ok",
+    "n_consensus_motifs": 3,
+    "self_match": null,
+    "matches": {
+      "motif-0": [
+        {
+          "rbp": "KHSRP",
+          "pcc": 0.9036
+        },
+        {
+          "rbp": "ZRANB2",
+          "pcc": 0.8977
+        },
+        {
+          "rbp": "SRP68",
+          "pcc": 0.8872
+        },
+        {
+          "rbp": "HNRNPH1",
+          "pcc": 0.8838
+        },
+        {
+          "rbp": "HNRNPH2",
+          "pcc": 0.8838
+        },
+        {
+          "rbp": "HNRNPH3",
+          "pcc": 0.8838
+        },
+        {
+          "rbp": "RB97D",
+          "pcc": 0.8797
+        },
+        {
+          "rbp": "SRP54",
+          "pcc": 0.8748
+        },
+        {
+          "rbp": "NFKB1",
+          "pcc": 0.8649
+        },
+        {
+          "rbp": "ADARB1",
+          "pcc": 0.8644
+        }
+      ],
+      "motif-1": [
+        {
+          "rbp": "PCBP2",
+          "pcc": 0.9404
+        },
+        {
+          "rbp": "HNRNPK",
+          "pcc": 0.9063
+        },
+        {
+          "rbp": "RBM6",
+          "pcc": 0.8853
+        },
+        {
+          "rbp": "KHSRP",
+          "pcc": 0.8743
+        },
+        {
+          "rbp": "RBM23",
+          "pcc": 0.8659
+        },
+        {
+          "rbp": "PCBP1",
+          "pcc": 0.8472
+        },
+        {
+          "rbp": "DDX59",
+          "pcc": 0.8046
+        },
+        {
+          "rbp": "HNRNPU",
+          "pcc": 0.7959
+        },
+        {
+          "rbp": "HNRNPA1",
+          "pcc": 0.7959
+        },
+        {
+          "rbp": "PTBP1",
+          "pcc": 0.7959
+        }
+      ],
+      "motif-2": [
+        {
+          "rbp": "TRA2",
+          "pcc": 0.851
+        },
+        {
+          "rbp": "RBMX",
+          "pcc": 0.8322
+        },
+        {
+          "rbp": "CTHT_0057680",
+          "pcc": 0.8113
+        },
+        {
+          "rbp": "PAP1",
+          "pcc": 0.8113
+        },
+        {
+          "rbp": "RNASEL",
+          "pcc": 0.8113
+        },
+        {
+          "rbp": "RRP6",
+          "pcc": 0.8113
+        },
+        {
+          "rbp": "PABPC3",
+          "pcc": 0.811
+        },
+        {
+          "rbp": "RBM6",
+          "pcc": 0.8021
+        },
+        {
+          "rbp": "PRP24",
+          "pcc": 0.801
+        },
+        {
+          "rbp": "NXF1",
+          "pcc": 0.801
+        }
+      ]
+    }
+  },
+  {
+    "protein": "ILF3_K562",
+    "status": "ok",
+    "n_consensus_motifs": 2,
+    "self_match": null,
+    "matches": {
+      "motif-0": [
+        {
+          "rbp": "PCBP2",
+          "pcc": 0.9067
+        },
+        {
+          "rbp": "PTBP1",
+          "pcc": 0.8537
+        },
+        {
+          "rbp": "KHSRP",
+          "pcc": 0.8404
+        },
+        {
+          "rbp": "SRSF5",
+          "pcc": 0.8404
+        },
+        {
+          "rbp": "IFIH1",
+          "pcc": 0.8061
+        },
+        {
+          "rbp": "MSS116",
+          "pcc": 0.8018
+        },
+        {
+          "rbp": "HNRNPA1",
+          "pcc": 0.7804
+        },
+        {
+          "rbp": "ORB2",
+          "pcc": 0.776
+        },
+        {
+          "rbp": "RC3H1",
+          "pcc": 0.7685
+        },
+        {
+          "rbp": "CPEB4",
+          "pcc": 0.7661
+        }
+      ],
+      "motif-1": [
+        {
+          "rbp": "HNRNPH1",
+          "pcc": 0.9599
+        },
+        {
+          "rbp": "HNRNPH2",
+          "pcc": 0.9599
+        },
+        {
+          "rbp": "SRSF11",
+          "pcc": 0.958
+        },
+        {
+          "rbp": "LIN28A",
+          "pcc": 0.9539
+        },
+        {
+          "rbp": "SRSF1",
+          "pcc": 0.9538
+        },
+        {
+          "rbp": "SRSF9",
+          "pcc": 0.9393
+        },
+        {
+          "rbp": "HNRNPA1",
+          "pcc": 0.9183
+        },
+        {
+          "rbp": "HNRNPF",
+          "pcc": 0.9183
+        },
+        {
+          "rbp": "HNRNPH3",
+          "pcc": 0.9183
+        },
+        {
+          "rbp": "SRSF2",
+          "pcc": 0.9061
+        }
+      ]
+    }
+  },
+  {
+    "protein": "EXOSC5_HepG2",
+    "status": "ok",
+    "n_consensus_motifs": 2,
+    "self_match": null,
+    "matches": {
+      "motif-0": [
+        {
+          "rbp": "FRP",
+          "pcc": 0.8196
+        },
+        {
+          "rbp": "SRSF1",
+          "pcc": 0.8105
+        },
+        {
+          "rbp": "G3BP2",
+          "pcc": 0.7897
+        },
+        {
+          "rbp": "ZFP36",
+          "pcc": 0.7845
+        },
+        {
+          "rbp": "RBM47",
+          "pcc": 0.778
+        },
+        {
+          "rbp": "NCBP2",
+          "pcc": 0.7719
+        },
+        {
+          "rbp": "SRSF2",
+          "pcc": 0.7514
+        },
+        {
+          "rbp": "RBM23",
+          "pcc": 0.73
+        },
+        {
+          "rbp": "F2",
+          "pcc": 0.728
+        },
+        {
+          "rbp": "TARDBP",
+          "pcc": 0.7215
+        }
+      ],
+      "motif-1": [
+        {
+          "rbp": "TLR3",
+          "pcc": 0.9957
+        },
+        {
+          "rbp": "PTBP1",
+          "pcc": 0.9857
+        },
+        {
+          "rbp": "RBM4",
+          "pcc": 0.9857
+        },
+        {
+          "rbp": "TIA1",
+          "pcc": 0.9785
+        },
+        {
+          "rbp": "CPEB4",
+          "pcc": 0.9716
+        },
+        {
+          "rbp": "PCBP1",
+          "pcc": 0.9261
+        },
+        {
+          "rbp": "U2AF2",
+          "pcc": 0.9161
+        },
+        {
+          "rbp": "DDX6",
+          "pcc": 0.9159
+        },
+        {
+          "rbp": "ILF3",
+          "pcc": 0.8967
+        },
+        {
+          "rbp": "U2AF1",
+          "pcc": 0.891
+        }
+      ]
+    }
+  },
+  {
+    "protein": "HNRNPU_HepG2",
+    "status": "ok",
+    "n_consensus_motifs": 2,
+    "self_match": {
+      "motif": "motif-1",
+      "rbp": "HNRNPU",
+      "pcc": 0.9848
+    },
+    "matches": {
+      "motif-0": [
+        {
+          "rbp": "ADARB1",
+          "pcc": 0.8927
+        },
+        {
+          "rbp": "RBM22",
+          "pcc": 0.8751
+        },
+        {
+          "rbp": "MSS116",
+          "pcc": 0.833
+        },
+        {
+          "rbp": "SRSF5",
+          "pcc": 0.8242
+        },
+        {
+          "rbp": "SRP68",
+          "pcc": 0.8158
+        },
+        {
+          "rbp": "ZRANB2",
+          "pcc": 0.7995
+        },
+        {
+          "rbp": "SRP14",
+          "pcc": 0.7931
+        },
+        {
+          "rbp": "TARDBP",
+          "pcc": 0.7818
+        },
+        {
+          "rbp": "PUM2",
+          "pcc": 0.7662
+        },
+        {
+          "rbp": "NUDT21",
+          "pcc": 0.7662
+        }
+      ],
+      "motif-1": [
+        {
+          "rbp": "PTBP1",
+          "pcc": 0.9875
+        },
+        {
+          "rbp": "RBMX",
+          "pcc": 0.9875
+        },
+        {
+          "rbp": "HNRNPK",
+          "pcc": 0.9863
+        },
+        {
+          "rbp": "KHSRP",
+          "pcc": 0.9848
+        },
+        {
+          "rbp": "HNRNPU",
+          "pcc": 0.9848
+        },
+        {
+          "rbp": "HNRNPA1",
+          "pcc": 0.9848
+        },
+        {
+          "rbp": "PCBP2",
+          "pcc": 0.9848
+        },
+        {
+          "rbp": "NOVA1",
+          "pcc": 0.9848
+        },
+        {
+          "rbp": "PCBP1",
+          "pcc": 0.9848
+        },
+        {
+          "rbp": "ELAVL1",
+          "pcc": 0.9848
+        }
+      ]
+    }
+  },
+  {
+    "protein": "DDX3X_K562",
+    "status": "ok",
+    "n_consensus_motifs": 2,
+    "self_match": null,
+    "matches": {
+      "motif-0": [
+        {
+          "rbp": "SXL",
+          "pcc": 0.8924
+        },
+        {
+          "rbp": "ADARB1",
+          "pcc": 0.8881
+        },
+        {
+          "rbp": "FUS",
+          "pcc": 0.8881
+        },
+        {
+          "rbp": "PRR3",
+          "pcc": 0.8029
+        },
+        {
+          "rbp": "RBM47",
+          "pcc": 0.7887
+        },
+        {
+          "rbp": "SRP19",
+          "pcc": 0.7542
+        },
+        {
+          "rbp": "SRSF2",
+          "pcc": 0.7465
+        },
+        {
+          "rbp": "TRA2B",
+          "pcc": 0.7397
+        },
+        {
+          "rbp": "EWSR1",
+          "pcc": 0.7206
+        },
+        {
+          "rbp": "BMVLG",
+          "pcc": 0.7187
+        }
+      ],
+      "motif-1": [
+        {
+          "rbp": "CPEB4",
+          "pcc": 0.9622
+        },
+        {
+          "rbp": "TIAL1",
+          "pcc": 0.9108
+        },
+        {
+          "rbp": "SRP19",
+          "pcc": 0.9091
+        },
+        {
+          "rbp": "SRP68",
+          "pcc": 0.9091
+        },
+        {
+          "rbp": "SRP54",
+          "pcc": 0.9091
+        },
+        {
+          "rbp": "PCBP2",
+          "pcc": 0.8936
+        },
+        {
+          "rbp": "TIA1",
+          "pcc": 0.893
+        },
+        {
+          "rbp": "PTBP1",
+          "pcc": 0.8725
+        },
+        {
+          "rbp": "EMG1",
+          "pcc": 0.8725
+        },
+        {
+          "rbp": "ELAVL2",
+          "pcc": 0.8685
+        }
+      ]
+    }
+  },
+  {
+    "protein": "UPF1_HepG2",
+    "status": "ok",
+    "n_consensus_motifs": 2,
+    "self_match": null,
+    "matches": {
+      "motif-0": [
+        {
+          "rbp": "RBM6",
+          "pcc": 0.9254
+        },
+        {
+          "rbp": "HNRNPK",
+          "pcc": 0.9067
+        },
+        {
+          "rbp": "KHSRP",
+          "pcc": 0.9052
+        },
+        {
+          "rbp": "ILF3",
+          "pcc": 0.8874
+        },
+        {
+          "rbp": "PCBP2",
+          "pcc": 0.8463
+        },
+        {
+          "rbp": "PCBP1",
+          "pcc": 0.8463
+        },
+        {
+          "rbp": "DDX59",
+          "pcc": 0.8426
+        },
+        {
+          "rbp": "PCBP4",
+          "pcc": 0.8064
+        },
+        {
+          "rbp": "SRP19",
+          "pcc": 0.8011
+        },
+        {
+          "rbp": "SRP68",
+          "pcc": 0.8011
+        }
+      ],
+      "motif-1": [
+        {
+          "rbp": "SRP68",
+          "pcc": 0.946
+        },
+        {
+          "rbp": "TAF15",
+          "pcc": 0.9308
+        },
+        {
+          "rbp": "HNRNPA2B1",
+          "pcc": 0.9308
+        },
+        {
+          "rbp": "ILF2",
+          "pcc": 0.9308
+        },
+        {
+          "rbp": "HNRNPH1",
+          "pcc": 0.9301
+        },
+        {
+          "rbp": "HNRNPH2",
+          "pcc": 0.9301
+        },
+        {
+          "rbp": "HNRNPF",
+          "pcc": 0.9301
+        },
+        {
+          "rbp": "HNRNPH3",
+          "pcc": 0.9301
+        },
+        {
+          "rbp": "KHSRP",
+          "pcc": 0.9235
+        },
+        {
+          "rbp": "RBMX",
+          "pcc": 0.9001
+        }
+      ]
+    }
+  },
+  {
+    "protein": "YBX3_K562",
+    "status": "ok",
+    "n_consensus_motifs": 3,
+    "self_match": null,
+    "matches": {
+      "motif-0": [
+        {
+          "rbp": "NCBP2",
+          "pcc": 0.9128
+        },
+        {
+          "rbp": "IGF2BP2",
+          "pcc": 0.8366
+        },
+        {
+          "rbp": "ADARB1",
+          "pcc": 0.8172
+        },
+        {
+          "rbp": "RBM23",
+          "pcc": 0.8169
+        },
+        {
+          "rbp": "XPO5",
+          "pcc": 0.8095
+        },
+        {
+          "rbp": "PUF68",
+          "pcc": 0.8032
+        },
+        {
+          "rbp": "SRSF5",
+          "pcc": 0.7986
+        },
+        {
+          "rbp": "SF1",
+          "pcc": 0.7887
+        },
+        {
+          "rbp": "HNRNPK",
+          "pcc": 0.752
+        },
+        {
+          "rbp": "HNRNPL",
+          "pcc": 0.744
+        }
+      ],
+      "motif-1": [
+        {
+          "rbp": "RBM23",
+          "pcc": 0.9152
+        },
+        {
+          "rbp": "HNRNPK",
+          "pcc": 0.8903
+        },
+        {
+          "rbp": "NXF1",
+          "pcc": 0.8695
+        },
+        {
+          "rbp": "HNRNPU",
+          "pcc": 0.8527
+        },
+        {
+          "rbp": "HNRNPA1",
+          "pcc": 0.8527
+        },
+        {
+          "rbp": "PTBP1",
+          "pcc": 0.8527
+        },
+        {
+          "rbp": "PCBP2",
+          "pcc": 0.8527
+        },
+        {
+          "rbp": "NOVA1",
+          "pcc": 0.8527
+        },
+        {
+          "rbp": "PCBP1",
+          "pcc": 0.8527
+        },
+        {
+          "rbp": "ELAVL1",
+          "pcc": 0.8527
+        }
+      ],
+      "motif-2": [
+        {
+          "rbp": "PCBP2",
+          "pcc": 0.9759
+        },
+        {
+          "rbp": "HNRNPK",
+          "pcc": 0.9539
+        },
+        {
+          "rbp": "HNRNPU",
+          "pcc": 0.9456
+        },
+        {
+          "rbp": "HNRNPA1",
+          "pcc": 0.9456
+        },
+        {
+          "rbp": "PTBP1",
+          "pcc": 0.9456
+        },
+        {
+          "rbp": "NOVA1",
+          "pcc": 0.9456
+        },
+        {
+          "rbp": "PCBP1",
+          "pcc": 0.9456
+        },
+        {
+          "rbp": "ELAVL1",
+          "pcc": 0.9456
+        },
+        {
+          "rbp": "RBM5",
+          "pcc": 0.9456
+        },
+        {
+          "rbp": "KHSRP",
+          "pcc": 0.9456
+        }
+      ]
+    }
+  }
+]

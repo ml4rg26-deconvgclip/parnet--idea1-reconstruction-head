@@ -1,0 +1,44 @@
+{
+  "motif-0": [
+    {
+      "rbp": "HNRNPH1",
+      "pcc": 0.8538
+    },
+    {
+      "rbp": "HNRNPH2",
+      "pcc": 0.8538
+    },
+    {
+      "rbp": "HNRNPF",
+      "pcc": 0.8538
+    },
+    {
+      "rbp": "HNRNPH3",
+      "pcc": 0.8538
+    },
+    {
+      "rbp": "PCBP2",
+      "pcc": 0.8515
+    },
+    {
+      "rbp": "KHSRP",
+      "pcc": 0.8251
+    },
+    {
+      "rbp": "3IVK",
+      "pcc": 0.8251
+    },
+    {
+      "rbp": "PTBP1",
+      "pcc": 0.7988
+    },
+    {
+      "rbp": "ZNF346",
+      "pcc": 0.7942
+    },
+    {
+      "rbp": "RC3H1",
+      "pcc": 0.7887
+    }
+  ]
+}

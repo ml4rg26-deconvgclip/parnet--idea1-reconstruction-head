@@ -1,0 +1,296 @@
+{
+  "motif-0": [
+    {
+      "rbp": "IGF2BP3",
+      "pcc": 0.8955
+    },
+    {
+      "rbp": "ZFP36",
+      "pcc": 0.89
+    },
+    {
+      "rbp": "RBFOX2",
+      "pcc": 0.8467
+    },
+    {
+      "rbp": "RBFOX1",
+      "pcc": 0.8466
+    },
+    {
+      "rbp": "RBFOX3",
+      "pcc": 0.8466
+    },
+    {
+      "rbp": "CELF1",
+      "pcc": 0.8299
+    },
+    {
+      "rbp": "TERT",
+      "pcc": 0.8298
+    },
+    {
+      "rbp": "PCBP2",
+      "pcc": 0.821
+    },
+    {
+      "rbp": "CELF2",
+      "pcc": 0.8194
+    },
+    {
+      "rbp": "EIF-2ALPHA",
+      "pcc": 0.8095
+    }
+  ],
+  "motif-1": [
+    {
+      "rbp": "SXL",
+      "pcc": 0.9873
+    },
+    {
+      "rbp": "ADARB1",
+      "pcc": 0.9652
+    },
+    {
+      "rbp": "FUS",
+      "pcc": 0.9652
+    },
+    {
+      "rbp": "PRNP",
+      "pcc": 0.934
+    },
+    {
+      "rbp": "HNRNPA1",
+      "pcc": 0.8761
+    },
+    {
+      "rbp": "SRSF1",
+      "pcc": 0.8671
+    },
+    {
+      "rbp": "HNRNPH1",
+      "pcc": 0.8671
+    },
+    {
+      "rbp": "HNRNPH2",
+      "pcc": 0.8671
+    },
+    {
+      "rbp": "HNRNPF",
+      "pcc": 0.8671
+    },
+    {
+      "rbp": "HNRNPH3",
+      "pcc": 0.8671
+    }
+  ],
+  "motif-2": [
+    {
+      "rbp": "PTBP1",
+      "pcc": 0.9552
+    },
+    {
+      "rbp": "EMG1",
+      "pcc": 0.9552
+    },
+    {
+      "rbp": "TIA1",
+      "pcc": 0.9094
+    },
+    {
+      "rbp": "SRSF7",
+      "pcc": 0.8925
+    },
+    {
+      "rbp": "IFIH1",
+      "pcc": 0.8752
+    },
+    {
+      "rbp": "AGO1",
+      "pcc": 0.8684
+    },
+    {
+      "rbp": "NAB3",
+      "pcc": 0.8614
+    },
+    {
+      "rbp": "PCBP2",
+      "pcc": 0.8566
+    },
+    {
+      "rbp": "RBM5",
+      "pcc": 0.8319
+    },
+    {
+      "rbp": "PUF60",
+      "pcc": 0.8248
+    }
+  ],
+  "motif-3": [
+    {
+      "rbp": "CPEB4",
+      "pcc": 0.9091
+    },
+    {
+      "rbp": "PTBP1",
+      "pcc": 0.8971
+    },
+    {
+      "rbp": "KHSRP",
+      "pcc": 0.8852
+    },
+    {
+      "rbp": "RBM15B",
+      "pcc": 0.8852
+    },
+    {
+      "rbp": "TB11.55.0009",
+      "pcc": 0.875
+    },
+    {
+      "rbp": "PCBP2",
+      "pcc": 0.8578
+    },
+    {
+      "rbp": "PCBP1",
+      "pcc": 0.8578
+    },
+    {
+      "rbp": "E_GW1.81.40.1",
+      "pcc": 0.8555
+    },
+    {
+      "rbp": "PUM1",
+      "pcc": 0.8469
+    },
+    {
+      "rbp": "NXF1",
+      "pcc": 0.8443
+    }
+  ],
+  "motif-4": [
+    {
+      "rbp": "PRR3",
+      "pcc": 0.8578
+    },
+    {
+      "rbp": "PHAX",
+      "pcc": 0.8165
+    },
+    {
+      "rbp": "HNRNPH1",
+      "pcc": 0.8159
+    },
+    {
+      "rbp": "RBM42",
+      "pcc": 0.806
+    },
+    {
+      "rbp": "SFPQ",
+      "pcc": 0.8039
+    },
+    {
+      "rbp": "SRSF1",
+      "pcc": 0.8039
+    },
+    {
+      "rbp": "TRA2B",
+      "pcc": 0.8039
+    },
+    {
+      "rbp": "RBMX",
+      "pcc": 0.8026
+    },
+    {
+      "rbp": "KHSRP",
+      "pcc": 0.797
+    },
+    {
+      "rbp": "RC3H1",
+      "pcc": 0.7929
+    }
+  ],
+  "motif-5": [
+    {
+      "rbp": "SRSF2",
+      "pcc": 0.9786
+    },
+    {
+      "rbp": "RBM23",
+      "pcc": 0.9149
+    },
+    {
+      "rbp": "RPB2",
+      "pcc": 0.9056
+    },
+    {
+      "rbp": "SBDS",
+      "pcc": 0.8728
+    },
+    {
+      "rbp": "YBX1",
+      "pcc": 0.8535
+    },
+    {
+      "rbp": "IGF2BP2",
+      "pcc": 0.8519
+    },
+    {
+      "rbp": "RBM6",
+      "pcc": 0.8348
+    },
+    {
+      "rbp": "IGF2BP1",
+      "pcc": 0.7916
+    },
+    {
+      "rbp": "U2AF1",
+      "pcc": 0.7784
+    },
+    {
+      "rbp": "SRSF5",
+      "pcc": 0.7759
+    }
+  ],
+  "motif-6": [
+    {
+      "rbp": "SRSF8",
+      "pcc": 0.9361
+    },
+    {
+      "rbp": "MBNL1",
+      "pcc": 0.9287
+    },
+    {
+      "rbp": "HNRNPK",
+      "pcc": 0.8907
+    },
+    {
+      "rbp": "SRSF2",
+      "pcc": 0.8903
+    },
+    {
+      "rbp": "LARP4",
+      "pcc": 0.889
+    },
+    {
+      "rbp": "IGF2BP2",
+      "pcc": 0.8889
+    },
+    {
+      "rbp": "EIF3D",
+      "pcc": 0.8886
+    },
+    {
+      "rbp": "SRSF5",
+      "pcc": 0.8817
+    },
+    {
+      "rbp": "ERI1",
+      "pcc": 0.8765
+    },
+    {
+      "rbp": "IGF2BP1",
+      "pcc": 0.8727
+    }
+  ]
+}

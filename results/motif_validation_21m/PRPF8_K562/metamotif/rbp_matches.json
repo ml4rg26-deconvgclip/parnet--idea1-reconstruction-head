@@ -1,0 +1,170 @@
+{
+  "motif-0": [
+    {
+      "rbp": "NFKB1",
+      "pcc": 0.8792
+    },
+    {
+      "rbp": "SRP54",
+      "pcc": 0.8792
+    },
+    {
+      "rbp": "ZRANB2",
+      "pcc": 0.8714
+    },
+    {
+      "rbp": "HNRNPDL",
+      "pcc": 0.8708
+    },
+    {
+      "rbp": "RBM5",
+      "pcc": 0.8692
+    },
+    {
+      "rbp": "PPR10",
+      "pcc": 0.8677
+    },
+    {
+      "rbp": "ELAVL4",
+      "pcc": 0.8667
+    },
+    {
+      "rbp": "ADARB1",
+      "pcc": 0.8593
+    },
+    {
+      "rbp": "KHSRP",
+      "pcc": 0.8314
+    },
+    {
+      "rbp": "TAF15",
+      "pcc": 0.824
+    }
+  ],
+  "motif-1": [
+    {
+      "rbp": "NFKB1",
+      "pcc": 0.981
+    },
+    {
+      "rbp": "SRP54",
+      "pcc": 0.981
+    },
+    {
+      "rbp": "TLR3",
+      "pcc": 0.9782
+    },
+    {
+      "rbp": "HNRNPA1",
+      "pcc": 0.9721
+    },
+    {
+      "rbp": "SRSF1",
+      "pcc": 0.9721
+    },
+    {
+      "rbp": "HNRNPH1",
+      "pcc": 0.9721
+    },
+    {
+      "rbp": "HNRNPH2",
+      "pcc": 0.9721
+    },
+    {
+      "rbp": "HNRNPF",
+      "pcc": 0.9721
+    },
+    {
+      "rbp": "HNRNPH3",
+      "pcc": 0.9721
+    },
+    {
+      "rbp": "EWSR1",
+      "pcc": 0.9712
+    }
+  ],
+  "motif-2": [
+    {
+      "rbp": "CPEB4",
+      "pcc": 0.9936
+    },
+    {
+      "rbp": "PCBP2",
+      "pcc": 0.9927
+    },
+    {
+      "rbp": "DDX59",
+      "pcc": 0.962
+    },
+    {
+      "rbp": "SRSF5",
+      "pcc": 0.9592
+    },
+    {
+      "rbp": "RBM23",
+      "pcc": 0.9457
+    },
+    {
+      "rbp": "TIAL1",
+      "pcc": 0.8978
+    },
+    {
+      "rbp": "TIA1",
+      "pcc": 0.8774
+    },
+    {
+      "rbp": "ELAVL2",
+      "pcc": 0.8414
+    },
+    {
+      "rbp": "IGF2BP1",
+      "pcc": 0.8331
+    },
+    {
+      "rbp": "FAM120A",
+      "pcc": 0.827
+    }
+  ],
+  "motif-3": [
+    {
+      "rbp": "PCBP2",
+      "pcc": 0.923
+    },
+    {
+      "rbp": "SRP19",
+      "pcc": 0.9211
+    },
+    {
+      "rbp": "SRP68",
+      "pcc": 0.9211
+    },
+    {
+      "rbp": "SRP54",
+      "pcc": 0.9211
+    },
+    {
+      "rbp": "RBM23",
+      "pcc": 0.849
+    },
+    {
+      "rbp": "HNRNPK",
+      "pcc": 0.846
+    },
+    {
+      "rbp": "RBM47",
+      "pcc": 0.8354
+    },
+    {
+      "rbp": "OAS1",
+      "pcc": 0.8184
+    },
+    {
+      "rbp": "ADARB1",
+      "pcc": 0.8128
+    },
+    {
+      "rbp": "PTBP1",
+      "pcc": 0.808
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+{
+  "motif-0": [
+    {
+      "rbp": "RPO21",
+      "pcc": 0.9157
+    },
+    {
+      "rbp": "PTBP1",
+      "pcc": 0.8661
+    },
+    {
+      "rbp": "DAZL",
+      "pcc": 0.8661
+    },
+    {
+      "rbp": "CELF2",
+      "pcc": 0.8661
+    },
+    {
+      "rbp": "CELF1",
+      "pcc": 0.8661
+    },
+    {
+      "rbp": "NAB3",
+      "pcc": 0.8661
+    },
+    {
+      "rbp": "BOLL",
+      "pcc": 0.8566
+    },
+    {
+      "rbp": "DAZ3",
+      "pcc": 0.8502
+    },
+    {
+      "rbp": "NFKB1",
+      "pcc": 0.8478
+    },
+    {
+      "rbp": "DDX58",
+      "pcc": 0.8478
+    }
+  ],
+  "motif-1": [
+    {
+      "rbp": "HEN1",
+      "pcc": 0.9349
+    },
+    {
+      "rbp": "RBM15",
+      "pcc": 0.8916
+    },
+    {
+      "rbp": "PCBP2",
+      "pcc": 0.8768
+    },
+    {
+      "rbp": "OAS1",
+      "pcc": 0.8323
+    },
+    {
+      "rbp": "MBNL1",
+      "pcc": 0.8094
+    },
+    {
+      "rbp": "PIWIL1",
+      "pcc": 0.8093
+    },
+    {
+      "rbp": "ORB2",
+      "pcc": 0.7977
+    },
+    {
+      "rbp": "NUDT21",
+      "pcc": 0.7969
+    },
+    {
+      "rbp": "FBF-2",
+      "pcc": 0.7892
+    },
+    {
+      "rbp": "PTBP1",
+      "pcc": 0.7789
+    }
+  ],
+  "motif-2": [
+    {
+      "rbp": "HNRNPA1",
+      "pcc": 0.9442
+    },
+    {
+      "rbp": "SRSF1",
+      "pcc": 0.9442
+    },
+    {
+      "rbp": "HNRNPH1",
+      "pcc": 0.9442
+    },
+    {
+      "rbp": "SRSF2",
+      "pcc": 0.9442
+    },
+    {
+      "rbp": "HNRNPH2",
+      "pcc": 0.9442
+    },
+    {
+      "rbp": "HNRNPF",
+      "pcc": 0.9442
+    },
+    {
+      "rbp": "HNRNPH3",
+      "pcc": 0.9442
+    },
+    {
+      "rbp": "PF10_0068",
+      "pcc": 0.9432
+    },
+    {
+      "rbp": "NCU02404",
+      "pcc": 0.9389
+    },
+    {
+      "rbp": "RUMP",
+      "pcc": 0.9343
+    }
+  ],
+  "motif-3": [
+    {
+      "rbp": "FUBP1",
+      "pcc": 0.9724
+    },
+    {
+      "rbp": "FRP",
+      "pcc": 0.9386
+    },
+    {
+      "rbp": "SRSF2",
+      "pcc": 0.9192
+    },
+    {
+      "rbp": "DAZL",
+      "pcc": 0.9112
+    },
+    {
+      "rbp": "CELF2",
+      "pcc": 0.9112
+    },
+    {
+      "rbp": "CELF1",
+      "pcc": 0.9112
+    },
+    {
+      "rbp": "SRSF9",
+      "pcc": 0.9042
+    },
+    {
+      "rbp": "HNRNPH1",
+      "pcc": 0.9042
+    },
+    {
+      "rbp": "HNRNPH2",
+      "pcc": 0.9042
+    },
+    {
+      "rbp": "LIN28A",
+      "pcc": 0.9042
+    }
+  ]
+}
