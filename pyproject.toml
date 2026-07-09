@@ -3,7 +3,7 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "globalclip-utils"
+name = "parnet-demo-train-models"
 version = "0.1.0"
 description = "GlobalCLIP CombiLayer: combining PARNET RBP tracks to predict GlobalCLIP signal."
 requires-python = ">=3.10,<3.11"

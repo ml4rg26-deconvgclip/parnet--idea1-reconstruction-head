@@ -201,6 +201,11 @@ def _full_analysis(
     (out_dir / "spearman.json").write_text(json.dumps({
         "mean_spearman": float(mean_rho), "median_spearman": float(np.median(all_rho)),
     }, indent=2))
+    # Per-sequence values, same layout as pearson_r_per_sequence.csv, needed
+    # for count-coverage-quartile box plots (mean/median alone are not enough).
+    pd.DataFrame({"sequence_index": np.arange(len(all_rho)), "spearman_r": all_rho}).to_csv(
+        out_dir / "spearman_r_per_sequence.csv", index=False
+    )
 
     # ── Windowed correlation (robustness to positional noise) ──────────────
     windowed = {n: evaluate_pearson_windowed(model, test_loader, device, n) for n in WINDOW_SIZES}
