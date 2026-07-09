@@ -67,13 +67,20 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--cnn-layers",    type=int,   default=3)
     p.add_argument("--lambda-nll",    type=float, default=0.1)
     p.add_argument("--lambda-alpha",  type=float, default=0.1)
-    p.add_argument("--lambda-phase",  type=float, default=0.01)
+    p.add_argument("--lambda-phase",  type=float, default=0.01,
+                    help="L2 penalty pulling QLayer phases toward 0 (i.e. toward no "
+                         "interference / behaving like a plain weighted sum), so the "
+                         "interference term only earns non-zero phases if it actually helps.")
     p.add_argument("--patience",      type=int,   default=8)
     p.add_argument("--gpu",           type=int,   default=0)
     p.add_argument("--seq-len",       type=int,   default=600)
     p.add_argument("--num-rbps",      type=int,   default=223)
-    p.add_argument("--positional-alpha", action="store_true")
-    p.add_argument("--positional-phase", action="store_true")
+    p.add_argument("--positional-alpha", action="store_true",
+                    help="Predict per-position mixing weights (B,223,L) instead of "
+                         "one global weight vector per sequence (B,223).")
+    p.add_argument("--positional-phase", action="store_true",
+                    help="Make the QLayer phase a function of local sequence context "
+                         "(B,223,L) instead of one fixed phase per protein (223,).")
     p.add_argument("--max-total-signal", type=float, default=None,
                     help="Drop windows with total signal above this value (e.g. 1000), "
                          "matching Idea 2's outlier-filtered dataset for a fair comparison.")

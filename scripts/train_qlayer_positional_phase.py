@@ -70,7 +70,10 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--cnn-layers",    type=int,   default=3)
     p.add_argument("--lambda-nll",    type=float, default=0.1)
     p.add_argument("--lambda-alpha",  type=float, default=0.1)
-    p.add_argument("--lambda-phase",  type=float, default=0.01)
+    p.add_argument("--lambda-phase",  type=float, default=0.01,
+                    help="L2 penalty pulling QLayer phases toward 0 (i.e. toward no "
+                         "interference / behaving like a plain weighted sum), so the "
+                         "interference term only earns non-zero phases if it actually helps.")
     p.add_argument("--patience",      type=int,   default=8)
     p.add_argument("--gpu",           type=int,   default=0)
     p.add_argument("--seq-len",       type=int,   default=600)

@@ -243,7 +243,7 @@ class GlobalCLIPStandardModel(nn.Module):
         scaled = rbp_tracks * scale[None, :, None]                 # (B, 223, L)
         alpha_bc = alpha[:, :, None] if alpha.dim() == 2 else alpha
         pred = (scaled * alpha_bc).sum(1, keepdim=True)             # (B, 1, L)
-        alpha_out = alpha if alpha.dim() == 2 else alpha.mean(dim=-1)
+        alpha_out = alpha if alpha.dim() == 2 else alpha.mean(dim=-1)  # collapse (B,223,L) -> (B,223) so ranking/correlation code works the same regardless of global vs. positional mode
         return pred, alpha_out
 
     def effective_weights(self, seq_onehot: torch.Tensor) -> torch.Tensor:
@@ -338,7 +338,7 @@ class GlobalCLIPQLayerModel(nn.Module):
 
         interference = self.qlayer(scaled, alpha, embedding=embedding)  # (B, 1, L)
         pred = self.cnn(interference)                             # (B, 1, L)
-        alpha_out = alpha if alpha.dim() == 2 else alpha.mean(dim=-1)
+        alpha_out = alpha if alpha.dim() == 2 else alpha.mean(dim=-1)  # collapse (B,223,L) -> (B,223) so ranking/correlation code works the same regardless of global vs. positional mode
         return pred, alpha_out
 
     def get_coupling_matrix(self, seq_onehot: torch.Tensor | None = None) -> torch.Tensor:
@@ -420,7 +420,7 @@ class GlobalCLIPCNNModel(nn.Module):
         alpha_bc = alpha[:, :, None] if alpha.dim() == 2 else alpha
         mixed = (scaled * alpha_bc).sum(1, keepdim=True)          # (B, 1, L) — same as Standard model
         pred = self.cnn(mixed)                                    # (B, 1, L)
-        alpha_out = alpha if alpha.dim() == 2 else alpha.mean(dim=-1)
+        alpha_out = alpha if alpha.dim() == 2 else alpha.mean(dim=-1)  # collapse (B,223,L) -> (B,223) so ranking/correlation code works the same regardless of global vs. positional mode
         return pred, alpha_out
 
 
@@ -522,7 +522,7 @@ class GlobalCLIPHybridModel(nn.Module):
 
         cnn_input = torch.cat([mixed, interference], dim=1)       # (B, 2, L)
         pred = self.cnn(cnn_input)                                # (B, 1, L)
-        alpha_out = alpha if alpha.dim() == 2 else alpha.mean(dim=-1)
+        alpha_out = alpha if alpha.dim() == 2 else alpha.mean(dim=-1)  # collapse (B,223,L) -> (B,223) so ranking/correlation code works the same regardless of global vs. positional mode
         return pred, alpha_out
 
     def get_coupling_matrix(self, seq_onehot: torch.Tensor | None = None) -> torch.Tensor:

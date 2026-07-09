@@ -158,7 +158,8 @@ ohne QLayer ... vs. mit QLayer").
 | `train_qlayer_positional_phase.py` | `GlobalCLIPQLayerModel` with **positional phase** always on | `--positional-alpha` (combine with positional α too), `--lambda-phase`, `--cnn-*` |
 | `train_combilayer.py` | `GlobalCLIPHybridModel` ("CombiLayer": CNN-only path + QLayer path, both fed to CNN) | `--positional-alpha`, `--positional-phase`, `--lambda-phase`, `--cnn-*` |
 | `export_results_data.py` | Loads **one** Standard + **one** QLayer run together, full analysis: protein ranking, alpha correlation matrix, QLayer phase polar plot + coupling matrix, baselines, significance tests, Spearman, windowed correlation, Integrated Gradients. Writes ~15 CSVs + PNGs to a flat output dir. | `--standard-run-id`, `--qlayer-run-id`, `--output-dir` |
-| `evaluate_new_models.py` | Evaluates **any subset** of {standard, qlayer, cnn_only} runs **independently** (each gets its own subfolder) — lighter-weight than `export_results_data.py`, just test-set Pearson r + distribution plot per model, no protein-ranking/IG/etc. | `--standard-run-id`, `--qlayer-run-id`, `--cnn-run-id` (any combination), `--output-dir` |
+| `evaluate_new_models.py` | Evaluates **any subset** of {standard, qlayer, cnn_only, combilayer} runs **independently** (each gets its own subfolder) — lighter-weight than `export_results_data.py`, just test-set Pearson r + distribution plot per model, no protein-ranking/IG/etc. | `--standard-run-id`, `--qlayer-run-id`, `--cnn-run-id`, `--combilayer-run-id` (any combination), `--output-dir` |
+| `motif_validation.py` | Independent check of the protein ranking: runs Integrated Gradients directly on PARNET's own frozen per-protein tracks (not on any combi-layer prediction), then the same metamotif + RBP-database pipeline as Idea 2, and checks whether each protein's own recovered motif matches its own literature motif ("self-match"). Does not depend on any globalCLIP fine-tuning or on our mixing weights. | `--proteins` (list of RBP-cell-line track names), `--output-dir`, `--gpu` |
 
 All training scripts save to `results/globalclip/<model-type>/<run-id>/`:
 `model.statedict.pt`, `model.full.pt`, `run_config.json` (hyperparameters —
@@ -174,49 +175,130 @@ afterward to get an actual held-out test-set number.
 
 - **`results/globalclip/<model>/<run-id>/`** — raw training output (checkpoints
   + training curves). Input to both evaluation scripts, not itself a result.
+  This local checkout only has the *early* runs (pre-outlier-filtering:
+  `standard.v1-v3`, `qlayer.v1`, two `cnn_only` ablations). The final,
+  filtered-dataset runs referenced in the table below (the `*_filtered_v1`
+  and `*_21m_filtered_v1` run-ids, plus `combilayer.filtered_v1`) were
+  trained on the server and are not all present in this local `results/` —
+  re-run the corresponding `nohup.txt` block if you need the checkpoints
+  themselves; the numbers below are already-verified final results.
 - **`results/data/`** — `export_results_data.py` output for the *first*
   QLayer run (had the phase-init bug). Kept for reference/history.
 - **`results/results_data_qlayer_v2/`** — `export_results_data.py` output
-  after the phase-bug fix (Standard v3 + QLayer v2). Current full analysis.
-- **`results/results_new/`** — `evaluate_new_models.py` output for the first
-  three ablation experiments (standard+positional, qlayer+positional,
-  cnn_only global-α).
-- **`results/new_v2/`** — `evaluate_new_models.py` output for the fourth
-  ablation (cnn_only + positional-α).
+  after the phase-bug fix (Standard v3 + QLayer v2).
+- **`results/results_new/`**, **`results/new_v2/`**, **`new_v3/`**, **`new_v4/`** —
+  `evaluate_new_models.py` output for the early (pre-filtering) ablation
+  experiments, in the order they were run (see `nohup.txt` for which
+  run-ids each corresponds to).
+- **`results/results_new_filtered_{standard_global,standard_positional,
+  cnn_global,cnn_positional,qlayer_global,qlayer_positional,qlayer_posphase,
+  combilayer}/`** — `evaluate_new_models.py` output for the final,
+  outlier-filtered runs (one folder per configuration). These are the
+  source of the "Findings so far" table below. The 21M-backbone run
+  (`cnn_only`, positional, 21M) was evaluated separately and is not present
+  under this naming pattern in this local checkout.
+- **`results/results_motif_validation/`** — `motif_validation.py` output:
+  one subfolder per tested protein (`metamotif/` search + alignment
+  results), plus `00_summary.json` with the self-match verdict per protein.
 
-## Findings so far (test-set mean Pearson r, `log1p(signal)` vs. prediction)
+## Findings so far (test-set mean Pearson r, outlier-filtered dataset, `log1p(signal)` vs. prediction)
 
-| Model | Mixing | Refinement | Mean r | Notes |
+| Model | Mixing | Backbone | Mean r | Notes |
 |---|---|---|---|---|
-| Baseline (naive track mean) | – | – | 0.189 | sequence-agnostic floor |
-| Standard | global | – | 0.266 | v3, tuned λ |
-| Standard | **positional** | – | **0.4315** | biggest single lever |
-| CNN-only (ablation) | global | CNN only | 0.430 | ≈ same jump as positional-α |
-| QLayer | global | interference + CNN | 0.407 | phase bug fixed; ≈ same as CNN-only *or slightly worse* |
-| QLayer | positional | interference + CNN | **0.4451** | best so far |
-| CNN-only (ablation) | positional | CNN only | **0.4458** | best overall — beats QLayer at both global and positional settings |
-| QLayer | positional | interference (positional phase) + CNN | 0.4325 | making phase positional as well made it *worse*, not better (−0.013 vs. global phase) — further evidence interference doesn't help here, regardless of how it's parameterized |
+| Standard | global | 7M | 0.264 | |
+| Standard | **positional** | 7M | **0.429** | biggest single lever (+0.165 over global) |
+| CNN-only (ablation) | global | 7M | 0.427 | |
+| CNN-only (ablation) | positional | 7M | 0.442 | |
+| CNN-only (ablation) | positional | **21M** | **0.476** | best overall |
+| QLayer | positional | 7M | 0.439 | interference + CNN, no measurable gain over CNN-only |
+| QLayer | positional, positional phase | 7M | 0.436 | phase also made position-dependent — still no gain |
+| CombiLayer (hybrid) | positional | 7M | 0.443 | CNN-only + QLayer signal fed together |
 
 **Key conclusions:**
 1. The global (one-per-sequence) mixing weight was the single biggest
-   architectural bottleneck — positional resolution alone nearly matches
-   what the full QLayer+CNN redesign achieved.
+   architectural bottleneck — switching to positional resolution alone
+   (+0.165 Pearson for the Standard model) is the largest lever anywhere in
+   this project, larger than any refinement architecture tested afterward.
 2. QLayer's phase/interference mechanism does **not** improve accuracy over
-   a plain CNN on the same mixed signal (CNN-only ≥ QLayer at matched
-   settings) — per `ideen.txt`'s own ablation criterion (Δr > 0.02 =
-   meaningful, < 0.01 = interactions barely matter), this says the modeled
-   interactions barely matter for prediction accuracy in this dataset.
+   a plain CNN on the same mixed signal: CNN-only (0.442), CombiLayer
+   (0.443), QLayer positional (0.439), and QLayer positional+phase (0.436)
+   are all within **0.007 Pearson** of each other at matched (7M,
+   positional) settings — statistically indistinguishable. This is why
+   QLayer/CombiLayer results are not reported in the team's LaTeX writeup.
 3. The QLayer coupling analysis (protein clusters, `cos(Δφ)`) is still
-   scientifically legitimate to report post-fix, but is an
-   *interpretability* result, not an *accuracy* result — and known
-   biological validation targets (spliceosome components) were not among
-   the model's dominant proteins in this run, and no destructive/competitive
-   couplings were found (only constructive, 0.77–1.0).
-4. r² context: best raw (1bp) result so far is r≈0.445 → r²≈0.20. A
-   Poisson counting-noise ceiling in the read-count data means very high r
-   (e.g. 0.9) is not realistically achievable at 1bp resolution regardless
-   of model size/training time — smoothing to ~50bp already lifts r to
-   ~0.65–0.70 for the better models, which is closer to a practical ceiling.
+   scientifically legitimate to report, but is an *interpretability*
+   result, not an *accuracy* result — and known biological validation
+   targets (spliceosome components) were not among the model's dominant
+   proteins in the run tested so far, and no destructive/competitive
+   couplings were found (only constructive). **This analysis predates the
+   outlier-filtering fix and should be re-run on the final checkpoints
+   before drawing conclusions from it** — see Outlook below.
+4. **Best accuracy is not best interpretability.** The 21M backbone gives
+   the best reconstruction accuracy (0.476), but an independent check
+   (`motif_validation.py`, self-match: does a protein's own recovered
+   motif match its own literature motif?) found the 7M backbone
+   self-matches 6 of its top 15 weighted proteins, versus only 2 of 15 for
+   the 21M backbone — and the 21M backbone's motifs are more fragmented
+   (3.27 vs. 2.33 consensus motifs per protein on average). The backbone
+   that best reconstructs the mixed signal is not the one whose per-protein
+   contributions are easiest to validate individually. See
+   `latex3/sections/results.tex` (`sec:selfmatch-results`) for the full
+   writeup.
+5. r² context: best result is r≈0.476 → r²≈0.23. A Poisson counting-noise
+   ceiling in the read-count data means very high r (e.g. 0.9) is not
+   realistically achievable at 1bp resolution regardless of model size or
+   training time — smoothing to ~50bp lifts r to ~0.65–0.70 for the better
+   models, which is closer to a practical ceiling.
+
+## Outlook / how to improve this further
+
+If you're picking this up next, roughly in priority order:
+
+1. **Diagnose the coupling matrix before trusting or discarding it.** The
+   core limitation behind points 3–4 above is an identifiability problem:
+   the reconstruction loss only ever sees the *aggregate* signal, never any
+   individual protein's true contribution. Proteins with correlated
+   Parnet-predicted tracks (e.g. PTBP1, PTBP2, PUF60 — all
+   polypyrimidine-tract binders) can trade mixing weight between each other
+   with almost no effect on the reconstructed signal, so the loss has no
+   way to prefer a "correct" attribution over a merely equivalent one. This
+   is exactly what QLayer's phase mechanism was meant to break via pairwise
+   interference, but it's unproven whether it actually does. Cheap first
+   step (no retraining): compute the raw correlation between Parnet's own
+   223 per-protein tracks directly — independent of any mixing weights —
+   and compare it against whatever coupling matrix a trained QLayer/
+   CombiLayer model produces. Agreement suggests the phase mechanism
+   captures genuine co-activity; disagreement means the aggregate-only loss
+   needs an explicit interaction-supervision term (a more expensive, second
+   step — only worth it if the diagnostic actually shows a mismatch).
+2. **Re-run the QLayer/CombiLayer coupling-matrix analysis on the final
+   filtered checkpoints.** The current coupling results (only cooperative
+   couplings found, expected spliceosome validation proteins not among the
+   dominant ones) predate the outlier-filtering fix and were never
+   recomputed on `*.filtered_v1` runs.
+3. **Test control-track normalization empirically, despite the "not
+   established as suitable" caveat.** All models here train on raw
+   `log1p(signal)`, never `log(1+signal) - log(1+control)`. An imperfect
+   control estimate could still help separate protein-specific signal from
+   shared background — this can only be settled by actually training a
+   variant with it and comparing, not by assumption. `datasets.py` and
+   `training_utils.py` already load/support `control`, just wired to be
+   unused (`compute_log_enrichment` exists but is dead code) — flip it back
+   on and compare.
+4. **Stability selection / ensemble training for robust protein rankings.**
+   `standard_global` and `standard_positional` share *no* common top-5
+   protein despite differing only in mixing mode — a real instability, not
+   noise. Train several seeds (or bootstrap-resampled data) per
+   configuration and only trust a protein's contribution if it's
+   consistently high-ranked across runs, rather than reading off a single
+   training run's top-5.
+5. **Biologically-informed grouping as a structural prior.** Instead of
+   223 fully free mixing weights, group tracks by known RBP complex
+   membership (spliceosome, EJC, hnRNP family — from STRING-DB or
+   literature) and mix within-group first, then between-group. This
+   reduces the degrees of freedom directly, which should make the
+   attribution more identifiable rather than just hoping a bigger/better
+   model sorts it out on its own.
 
 ## Quick reference: running an experiment end-to-end
 

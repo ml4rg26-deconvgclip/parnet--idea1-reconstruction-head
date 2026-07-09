@@ -1,121 +1,23 @@
 [build-system]
-
-requires = ["setuptools>=42", "wheel", "setuptools_scm[toml]>=6.2"]
+requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-
-name="parnet--demo--train-models"
-description="Demo project for manipulating the training datasets for PARNET."
+name = "globalclip-utils"
+version = "0.1.0"
+description = "GlobalCLIP CombiLayer: combining PARNET RBP tracks to predict GlobalCLIP signal."
 requires-python = ">=3.10,<3.11"
-
-version = "0.0.1"
-#dynamic = ["version"]
-
-authors = [
-  { name = "Lambert Moyon", email = "lambert.moyon@helmholtz-munich.de" }
-]
-license = {text = "Apache-2.0"}
-readme = {file = "README.md", content-type = "text/markdown"}
+authors = [{ name = "MLG Project" }]
+license = { text = "Apache-2.0" }
 
 [tool.setuptools.packages.find]
-
 where = ["src"]
 
-#[tool.setuptools_scm]
-
-#write_to = "src/parnet_analyses/_version.py"
-
-
 [tool.pytest.ini_options]
-
-addopts = "-ra --cov"
-# See https://stackoverflow.com/questions/10253826/path-issue-with-pytest-importerror-no-module-named-yadayadayada
-pythonpath = ['.']
+pythonpath = ["."]
 testpaths = ["tests"]
 
-[tool.coverage.report]
-
-show_missing = true
-
 [tool.ruff]
-
 target-version = "py310"
-line-length = 102
+line-length = 100
 indent-width = 4
-
-[tool.ruff.format]
-
-quote-style = "double"  # Like Black, use double quotes for strings.
-indent-style = "space"  # Like Black, indent with spaces, rather than tabs.
-line-ending = "auto"
-docstring-code-format = false  # Automatically format Python code examples in docstrings.
-docstring-code-line-length = "dynamic"  # or INT
-
-[tool.ruff.lint]
-
-extend-select = [
-  'D',  #pydocstyle - docstrings
-  'E',  # pycodestyle - generic errors
-  'W',  # pycodestyle - warnings
-  "E2",  # pycodestyle - whitespace rules
-  "E4",  # pycodestyle - import rules
-  "E7",  # pycodestyle - statement rules
-  "E9",  # pycodestyle - runtime rules
-  'F',   # Pyflakes: source file errors, unsued variables.
-  'I',  # sort imports
-  'UP',  # pyupgrade - upgrade syntax
-  "ANN",  # flake8 - annotations
-  "RUF",  # ruff dev's own rules
-  "SIM",  # pyflakes simplicity - encourages simpler code.
-  "C90",  # more complexity rules
-]
-
-ignore = [
-  "E201",  # whitespace after '('
-  "E202",  # whitespace before ')'
-  "E211",  # whitespace before '('
-  "E203",  # Whitespace before ':'
-  "F722",  # Forward annotation (deactivated for jaxtyping)
-]
-
-# Allow fix for all enabled rules (when `--fix`) is provided.
-fixable = ["ALL"]
-unfixable = [
-  "F401",  # Disable fix for unused imports (`F401`).
-  "E501",  # line too long
-  #"W504",  # prevent line break after binary operator ; NOTE: pycodestyle rule, not handled by ruff.
-]
-
-
-[tool.ruff.lint.pydocstyle]
-
-convention = "google"
-
-[tool.ruff.lint.isort]
-
-combine-as-imports = true
-split-on-trailing-comma = false
-
-[tool.mypy]
-
-python_version = "3.10"
-warn_return_any = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-
-# Allow gradual typing; don’t fail on third-party packages without stubs
-ignore_missing_imports = true
-
-# Enforce typing on your own functions
-check_untyped_defs = true
-
-# Optional / stricter checks
-no_implicit_optional = true
-strict_equality = true
-
-# Test folder relaxed
-[[tool.mypy.overrides]]
-
-module = ["tests.*"]
-disallow_untyped_defs = false
