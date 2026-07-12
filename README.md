@@ -319,3 +319,7 @@ pixi run -e parnet-dev-cu12 python scripts/evaluate_new_models.py \
 
 See `nohup.txt` for ready-to-paste `nohup` background-run commands
 (including the full training+eval chains actually used so far).
+
+## Further adjustments
+  see outlook.txt
+  
