@@ -1,0 +1,123 @@
+================================================================================
+OUTLOOK: Protein Interaction & Identifiability — Next Steps
+As of: 2026-07-09 (from call discussion, latex2 review)
+================================================================================
+
+1. THE CORE PROBLEM
+--------------------------------------------------------------------------------
+The reconstruction loss only ever sees the AGGREGATE globalCLIP signal,
+never the contributions of individual proteins. This creates a real
+identifiability problem: if two proteins (e.g. PTBP1, PTBP2, PUF60) have
+strongly correlated, similar Parnet tracks, the model can shift weight
+between them arbitrarily without the reconstructed signal changing
+measurably. The training loss is blind to this ambiguity — it cannot
+distinguish "correct" attribution from "numerically equivalent but wrong"
+attribution.
+
+Partial solution already in place: the log-amplitude s_k is fixed per
+protein across ALL windows/positions (not relearned per window) — this
+prevents window-level overfitting, but does NOT solve the risk of confusing
+different, but correlated, proteins with each other. This is the actual
+reason QLayer was originally developed: the phase-interference mechanism
+was meant to give correlated proteins a distinguishable "fingerprint" via
+the cross-terms with all 222 other proteins — structure a plain linear sum
+cannot represent.
+
+QLayer/CombiLayer have not demonstrably solved this so far, though:
+statistically tied with CNN-only on accuracy (within 0.007 Pearson), and
+the coupling-matrix analysis is still inconclusive (only cooperative, no
+competitive couplings found; expected validation proteins such as
+spliceosome components U2AF1/U2AF2, SF3B4, PRPF8 are missing from the
+dominant proteins) — and it has so far only been run on an earlier model
+version, not on the final filtered checkpoints.
+
+
+2. NEW IDEA FROM THE CALL: EMPIRICAL CORRELATION AS AN INDEPENDENT CHECK
+--------------------------------------------------------------------------------
+Proposal: instead of just hoping QLayer's learned coupling matrix reflects
+real protein-protein cooperation, check it INDEPENDENTLY — directly from
+the raw, uncombined Parnet tracks, with no training loss or mixing weights
+involved at all:
+
+  For every protein pair (i, j): compute the correlation between
+  track_i(p) and track_j(p) across all positions p, and across many
+  training windows.
+
+This "raw" correlation is not ambiguous — it's based only on Parnet's own
+independent per-protein predictions, before any combination happens. High
+correlation = the two proteins consistently predict high values at the same
+positions = genuine evidence of co-occurrence (cooperation), or of
+confusability risk.
+
+TWO POSSIBLE WAYS TO USE THIS:
+
+  (a) Validation / diagnostic (recommended as the FIRST step):
+      Compute the raw track-correlation matrix (no retraining needed, just
+      a computation on existing checkpoints/data) and compare it against
+      QLayer's learned coupling matrix (cos(phase_i - phase_j)). If they
+      agree → strong, independent evidence that QLayer's phase mechanism
+      learned genuine structure, not noise. If they DON'T agree → likely
+      explains why the interaction analysis has been inconclusive so far
+      (see section 1).
+
+  (b) Explicit loss term (only if (a) shows a discrepancy):
+      Add the raw correlation matrix as an additional training target that
+      pulls the learned coupling matrix toward the empirical co-activity —
+      giving the model real supervision on interaction structure, instead
+      of hoping it falls out of the pure reconstruction loss. Cost: a new
+      hyperparameter (weighting against the Pearson/NLL/sparsity terms
+      already present), requires retraining, adds complexity.
+
+RECOMMENDATION: do (a) first, only do (b) if actually needed.
+  - (a) is essentially free: no retraining, doable immediately with
+    existing checkpoints/data, gives an answer this week.
+  - (a) is diagnostic BEFORE it's corrective: right now we don't know
+    whether the coupling matrix reflects real signal or noise — this check
+    answers that directly, before investing effort in a new loss term.
+  - Only if (a) shows the learned coupling matrix does NOT match the raw
+    correlation is (b) worth the effort — at that point we'd know the pure
+    reconstruction loss genuinely isn't enough and explicit supervision is
+    needed.
+
+
+3. FURTHER OPEN ITEMS (from earlier discussions, still valid)
+--------------------------------------------------------------------------------
+- Re-run the QLayer/CombiLayer coupling-matrix analysis on the final,
+  outlier-filtered checkpoints (current results are from an earlier model
+  version and not yet final).
+- Stability selection / ensemble: compare multiple independent training
+  runs (different seeds or bootstrap resamples) and only trust proteins
+  whose high weighting is consistent across runs — addresses the observed
+  instability (global vs. positional mixing give completely different
+  top-5 proteins).
+- Test control-track normalization empirically after all (Lysate_noNHS
+  etc.) — could strip out shared background and sharpen protein-specific
+  signal, even though its suitability hasn't been officially confirmed.
+- Biologically informed grouping: use known protein complexes (spliceosome,
+  EJC, hnRNP family, from STRING-DB or literature) as a structural prior to
+  reduce the degrees of freedom in the 223 weights and make attribution
+  more structurally identifiable, instead of learning everything freely.
+- Additionally validate the coupling matrix against independent
+  protein-interaction databases (STRING-DB), not just motif databases.
+- Normalize the motif-detection significance threshold onto a comparable
+  scale between the 7M and 21M backbones, to check whether the stronger
+  fragmentation seen with the 21M backbone is a real effect or just an
+  artifact of different IG attribution scales.
+- Generate consensus-motif letter-code plots for the refined Idea-1 models
+  (needs the server: RBP motif database + metamotif tool not available
+  locally).
+
+
+4. KEY TAKEAWAY FOR THE OUTLOOK
+--------------------------------------------------------------------------------
+Best predictive accuracy (highest Pearson r) and best protein-level
+interpretability are two separate goals that, in this project so far, move
+in opposite directions (21M backbone: best predictor, weakest motif/
+interaction resolution). The right next step is not to throw more capacity
+or architectural complexity at the accuracy objective, but to deliberately
+add information the pure reconstruction loss is missing — first and
+foremost, the raw, uncombined protein correlation as a signal for genuine
+cooperation between proteins.
+================================================================================
+End of file.
+================================================================================
