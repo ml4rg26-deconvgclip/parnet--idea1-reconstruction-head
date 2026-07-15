@@ -1,6 +1,7 @@
 ================================================================================
 OUTLOOK: Protein Interaction & Identifiability — Next Steps
 As of: 2026-07-09 (from call discussion, latex2 review)
+Amended: 2026-07-15 — cross-check against external shortcut-learning review, see section 5
 ================================================================================
 
 1. THE CORE PROBLEM
@@ -118,6 +119,109 @@ or architectural complexity at the accuracy objective, but to deliberately
 add information the pure reconstruction loss is missing — first and
 foremost, the raw, uncombined protein correlation as a signal for genuine
 cooperation between proteins.
+
+
+5. EXTERNAL REVIEW CROSS-CHECK (2026-07-15): SHORTCUT LEARNING / GLOBAL-MIXING BIAS
+--------------------------------------------------------------------------------
+An external second-opinion review diagnosed the Pearson-inflation issue as shortcut
+learning: global positional mixing lets the model absorb RNA-abundance / expression
+background into the reconstructed signal instead of learning real, local RBP motifs
+(motifs get "smeared" and sigmoid-saturated). First cross-checked against the code
+in project-parnet/src/globalclip_utils/{model,training_utils}.py; then re-checked
+against project-parnet/README.md, which turns out to already contain the final,
+outlier-filtered test-set numbers and its OWN "Outlook" section — a more complete
+and more current document than this file for items 1-4 above (see note at the end).
+That numeric evidence changes the priority of a few of the items below; corrected
+version:
+
+5a. ALREADY IN PLACE, AND ALREADY EMPIRICALLY CONFIRMED — no action needed
+  - The review's core diagnosis (global mixing lets background/abundance leak into
+    the prediction) is not just architecturally addressed, it is already this
+    project's single most validated finding. README.md's Findings table shows
+    switching MixCoeffHead from global (mean-pool embedding over the full 600nt,
+    one alpha per sequence) to positional (`positional_alpha=True`, per-position,
+    kernel_size=1, zero cross-position context) gave the largest accuracy jump
+    anywhere in the project: Standard model 0.264 -> 0.429 (+0.165 r), and the same
+    direction for CNN-only (0.427 -> 0.442) and QLayer (0.407 -> 0.439). README
+    calls this "the single biggest architectural bottleneck ... larger than any
+    refinement architecture tested afterward" and every documented training command
+    already defaults to `--positional-alpha`. So this isn't a hypothesis to test —
+    it was already tested, at the two extremes (full-window vs. zero-context), and
+    zero-context won decisively.
+  - Pyramidal dilation (1, 2, 4, ...) in the post-QLayer CNN (model.py,
+    GlobalCLIPQLayerModel.__init__, `dil = 2 ** i`) already matches the "first layer
+    dilation=1, deepen gradually" recommendation. Its receptive field is only
+    roughly 55-60nt (kernel=9, 3 layers).
+  - The final prediction is NOT sigmoid-squashed. `pred` is a raw regression output
+    trained against log1p(signal) via Pearson+NLL loss. The only sigmoid sits inside
+    MixCoeffHead on the per-protein alpha mixing weights (a 0-1 mixing coefficient by
+    design), not on the final signal amplitude — so "desaturate the output sigmoid"
+    doesn't apply the way the review assumed.
+  - multinomial_nll_loss already normalizes over the sequence via log_softmax, which
+    achieves the same purpose as the review's "divide by outputs.sum()" suggestion.
+  - A working motif-quality check already exists and has already been run once:
+    `motif_validation.py` runs Integrated Gradients directly on PARNET's own frozen
+    per-protein tracks and checks each protein's recovered motif against its
+    literature motif ("self-match"), independent of any combi-layer mixing weights.
+    README Findings #4: 7M backbone self-matches 6/15 top-weighted proteins vs. only
+    2/15 for the 21M backbone (3.27 vs. 2.33 consensus motifs/protein). So "does the
+    model actually find real motifs" is not an open question needing new tooling —
+    it's already measured; see 5b for what's still missing (using it *during*
+    training, not just post-hoc).
+
+5b. GENUINELY NEW, BUT RE-PRIORITIZED AGAINST THE ABOVE EVIDENCE
+  - Windowed mixing (Conv1d with a real kernel, e.g. ~101nt, in MixCoeffHead, as a
+    middle ground between global-mean-pool and zero-context positional) is still
+    unimplemented and still a legitimate experiment — but LOW priority, not high:
+    the zero-context extreme already beat the full-window extreme by the largest
+    margin in the whole project (5a), so there's no existing evidence a partial
+    window would help further, and it could just as easily reintroduce some of the
+    averaging that hurt in the first place. Only worth trying if someone specifically
+    wants to explain the remaining global/positional top-5 protein instability
+    (section 3) as a smoothing question rather than as an identifiability question.
+  - Residual/delta learning against the frozen backbone's own combined signal is
+    still unimplemented and still a reasonable small experiment for stripping
+    expression bias before combining — but temper expectations: README Findings #5
+    notes a Poisson counting-noise ceiling on this data (best raw result r=0.476,
+    r^2=0.23; smoothing to ~50bp lifts the practical ceiling to only ~0.65-0.70).
+    Any bias-removal trick is bounded by that same ceiling, not just by architecture.
+  - A ranking loss (e.g. margin ranking on local peak order) alongside or instead of
+    part of the Pearson loss is still unimplemented and still a good fit for this
+    outlook's own section 4 takeaway ("add information the pure reconstruction loss
+    is missing") — nothing in README's numbers argues against trying it.
+  - Wiring `motif_validation.py`'s self-match check into the training loop as an
+    early-stopping / model-selection signal (instead of only running it once,
+    post-hoc, per README Findings #4) is the part of the "motif-based early
+    stopping" idea that's actually still open. Same constraint as the consensus-motif
+    plots in section 3: needs the RBP motif database + metamotif tool, server-only.
+
+5c. REVIEW POINTS THAT DON'T MAP CLEANLY ONTO THIS CODEBASE — needs reframing
+  - BCEWithLogitsLoss was recommended to replace sigmoid+Pearson, assuming the model
+    predicts binary peak/no-peak labels. It doesn't: the target is continuous
+    log1p(read-count) regression, and there are no binary peak labels in the dataset
+    to supervise a BCE loss against. The ranking loss in 5b is the closer fit to what
+    the review is actually after (sharper, less-smeared peaks) without needing
+    labels we don't have.
+  - The QLayer "potential regularization" / wavefunction-delocalization suggestion
+    assumes QLayer solves a spatial Schrodinger-type equation with a potential term.
+    It doesn't — QLayer (model.py) is a per-protein *phase* interference layer
+    (phi_i is a scalar, or per-position via positional_phase, per protein; no
+    potential, no finite-differences PDE solve). The closest existing lever is the
+    `lambda_phase` phase regularization already in training_utils.py, not a new
+    potential term.
+
+NOTE ON THIS FILE VS. README.md: project-parnet/README.md has its own "Outlook /
+how to improve this further" section (5 items, with numbers) that already covers
+sections 1-4 of this file in more current/detailed form — including the raw-
+correlation idea from section 2, folded into its item 1. This file's unique,
+not-yet-merged content is: the specific write-up framing in sections 1-2, and all
+of section 5 above. Worth merging into README.md next, so there's one current
+outlook doc instead of two that can drift apart (this revision already fixed one
+such drift: section 3's "normalize motif threshold 7M vs 21M" item overlaps with
+README Findings #4, which already has self-match/fragmentation numbers for both
+backbones — worth confirming with whoever ran motif_validation.py whether that
+specific concern is already settled or still open before treating it as new work).
+
 ================================================================================
 End of file.
 ================================================================================
